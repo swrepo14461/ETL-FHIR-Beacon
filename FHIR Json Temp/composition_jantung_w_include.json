@@ -2051,94 +2051,93 @@
             }
         },
         {
-  "fullUrl": "https://api-satusehat-stg.dto.kemkes.go.id/fhir-r4/v1/Medication/6b7d5850-b14a-4c77-80ae-31ed38e3206e",
-  "resource": {
-    "batch": {
-      "expirationDate": "2025-07-22T14:27:00+00:00",
-      "lotNumber": "1625042B"
-    },
-    "code": {
-      "coding": [
-        {
-          "code": "93002126",
-          "display": "Amlodipine Besilate 5 mg Tablet (DEXA MEDICA)",
-          "system": "http://sys-ids.kemkes.go.id/kfa"
-        }
-      ]
-    },
-    "extension": [
-      {
-        "url": "https://fhir.kemkes.go.id/r4/StructureDefinition/MedicationType",
-        "valueCodeableConcept": {
-          "coding": [
-            {
-              "code": "NC",
-              "display": "Non-compound",
-              "system": "http://terminology.kemkes.go.id/CodeSystem/medication-type"
+            "fullUrl": "https://api-satusehat-stg.dto.kemkes.go.id/fhir-r4/v1/Medication/6b7d5850-b14a-4c77-80ae-31ed38e3206e",
+            "resource": {
+                "batch": {
+                    "expirationDate": "2025-07-22T14:27:00+00:00",
+                    "lotNumber": "1625042B"
+                },
+                "code": {
+                    "coding": [
+                        {
+                            "code": "93002126",
+                            "display": "Amlodipine Besilate 5 mg Tablet (DEXA MEDICA)",
+                            "system": "http://sys-ids.kemkes.go.id/kfa"
+                        }
+                    ]
+                },
+                "extension": [
+                    {
+                        "url": "https://fhir.kemkes.go.id/r4/StructureDefinition/MedicationType",
+                        "valueCodeableConcept": {
+                            "coding": [
+                                {
+                                    "code": "NC",
+                                    "display": "Non-compound",
+                                    "system": "http://terminology.kemkes.go.id/CodeSystem/medication-type"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "form": {
+                    "coding": [
+                        {
+                            "code": "BS066",
+                            "display": "Tablet",
+                            "system": "http://terminology.kemkes.go.id/CodeSystem/medication-form"
+                        }
+                    ]
+                },
+                "id": "6b7d5850-b14a-4c77-80ae-31ed38e3206e",
+                "identifier": [
+                    {
+                        "system": "http://sys-ids.kemkes.go.id/medication/6e3e3a13-8114-44b2-90b3-bbaeeeebf9f0",
+                        "use": "official",
+                        "value": "123456797"
+                    }
+                ],
+                "ingredient": [
+                    {
+                        "isActive": true,
+                        "itemCodeableConcept": {
+                            "coding": [
+                                {
+                                    "code": "91000397",
+                                    "display": "AMLODIPINE",
+                                    "system": "http://sys-ids.kemkes.go.id/kfa"
+                                }
+                            ]
+                        },
+                        "strength": {
+                            "denominator": {
+                                "code": "TAB",
+                                "system": "http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm",
+                                "unit": "TAB",
+                                "value": 1
+                            },
+                            "numerator": {
+                                "code": "mg",
+                                "system": "http://unitsofmeasure.org",
+                                "value": 5
+                            }
+                        }
+                    }
+                ],
+                "manufacturer": {
+                    "reference": "Organization/6e3e3a13-8114-44b2-90b3-bbaeeeebf9f0"
+                },
+                "meta": {
+                    "lastUpdated": "2025-08-06T08:56:09.925002+00:00",
+                    "profile": [
+                        "https://fhir.kemkes.go.id/r4/StructureDefinition/Medication"
+                    ],
+                    "versionId": "MTc1NDQ3MDU2OTkyNTAwMjAwMA"
+                },
+                "resourceType": "Medication",
+                "status": "active"
             }
-          ]
         }
-      }
-    ],
-    "form": {
-      "coding": [
-        {
-          "code": "BS066",
-          "display": "Tablet",
-          "system": "http://terminology.kemkes.go.id/CodeSystem/medication-form"
-        }
-      ]
-    },
-    "id": "6b7d5850-b14a-4c77-80ae-31ed38e3206e",
-    "identifier": [
-      {
-        "system": "http://sys-ids.kemkes.go.id/medication/6e3e3a13-8114-44b2-90b3-bbaeeeebf9f0",
-        "use": "official",
-        "value": "123456797"
-      }
-    ],
-    "ingredient": [
-      {
-        "isActive": true,
-        "itemCodeableConcept": {
-          "coding": [
-            {
-              "code": "91000397",
-              "display": "AMLODIPINE",
-              "system": "http://sys-ids.kemkes.go.id/kfa"
-            }
-          ]
-        },
-        "strength": {
-          "denominator": {
-            "code": "TAB",
-            "system": "http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm",
-            "unit": "TAB",
-            "value": 1
-          },
-          "numerator": {
-            "code": "mg",
-            "system": "http://unitsofmeasure.org",
-            "value": 5
-          }
-        }
-      }
-    ],
-    "manufacturer": {
-      "reference": "Organization/6e3e3a13-8114-44b2-90b3-bbaeeeebf9f0"
-    },
-    "meta": {
-      "lastUpdated": "2025-08-06T08:56:09.925002+00:00",
-      "profile": [
-        "https://fhir.kemkes.go.id/r4/StructureDefinition/Medication"
-      ],
-      "versionId": "MTc1NDQ3MDU2OTkyNTAwMjAwMA"
-    },
-    "resourceType": "Medication",
-    "status": "active"
-  }
-}
-
     ],
     "link": [
         {
