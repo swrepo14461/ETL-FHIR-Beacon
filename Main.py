@@ -1,5 +1,6 @@
 import os
 import FHIRProcess
+import YamlToBeaconConverter
 
 jsonFiles = []
 pathFhirJsonDir = os.path.join(os.getcwd(), 'FHIR Json')
@@ -24,8 +25,6 @@ for jsonFile in jsonFiles:
         invalid_count += 1
 
 print(f"Validation complete. Valid files: {valid_count}, Invalid files: {invalid_count}")
-ready = input("Next Step ? ") 
-
 print(f"Start processing JSON files...")
 beacon = {
     "datasetId": "UNQ_1", 
@@ -49,4 +48,5 @@ beacon = {
         "version": "v1.1"
     },
 }
-# for jsonFile in valid_files:
+for filesTobeacon in valid_files:
+    FHIRProcess.process_fhir_resource(beacon, filesTobeacon)
