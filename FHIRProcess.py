@@ -81,6 +81,7 @@ def process_fhir_resource(beacon, file_path):
             obj = Condition.model_validate_json(json.dumps(resource_json))
         elif resource_type == "Observation":
             obj = Observation.model_validate_json(json.dumps(resource_json))
+            beacon = YamlToBeaconConverter.processObservation(beacon, obj)
         elif resource_type == "AllergyIntolerance":
             obj = AllergyIntolerance.model_validate_json(json.dumps(resource_json))
         elif resource_type == "MedicationRequest":

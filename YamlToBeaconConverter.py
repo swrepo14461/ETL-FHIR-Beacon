@@ -3,6 +3,7 @@ import os
 import zipfile
 import shutil
 import pandas as pd
+import json
 
 target = {}
 pathBeaconDir = os.path.join(os.getcwd(), 'Beacon')
@@ -59,8 +60,8 @@ def processPatient(beacon, fhirObj):
     fhirObjDict = fhirObj.model_dump()
     mapper_path = os.path.join(os.getcwd(), "Mapper.xlsx")
     df = pd.read_excel(mapper_path, sheet_name="Mapper")
-    df_patient = df[df["a"] == "Patient"]
-    groupsMapper = df_patient.groupby("b")
+    df_filtered = df[df["Where to Find"] == "Patient"]
+    groupsMapper = df_filtered.groupby("Where to Use")
 
     for key, group in groupsMapper:
         if key not in beacon:
@@ -72,61 +73,227 @@ def processPatient(beacon, fhirObj):
             target = beacon[key][0]
 
         for _, row in group.iterrows():
-            # temp value
-            value = {
-                "object": {},
-                "array": [],
-                "string": "",
-                "number": 0,
-                "float": 0,
-                "boolean": False,
-                "null": None
-            }
+            mapFhirToBeacon(row, target, fhirObjDict, df_filtered)
 
-            # get value from fhir
-            typeFind = row["Type of Find Used"]
-            if pd.notna(row["What to Find Third"]):
-                value[typeFind] = fhirObjDict[row["What to Find First"]][row["What to Find Second"]][row["What to Find Third"]]
-            elif pd.notna(row["What to Find Second"]):
-                value[typeFind] = fhirObjDict[row["What to Find First"]][row["What to Find Second"]]
-            elif pd.notna(row["What to Find First"]):
-                value[typeFind] = fhirObjDict[row["What to Find First"]]
+        beacon[key].append(target)
 
-            # get instruction and set value
-            whatToDoFind = row["What to Do"]
-            if not whatToDoFind:
-                setBeaconValue(row, target, value[typeFind])
-            else:
-                arrToDo = whatToDoFind.split('|')
-            # typeDataFind = row["Type of Find Used"]
-            # if typeDataFind == "string":
+    return beacon
 
+def processObservation(beacon, fhirObj):
+    fhirObjDict = fhirObj.model_dump()
+    mapper_path = os.path.join(os.getcwd(), "Mapper.xlsx")
+    df = pd.read_excel(mapper_path, sheet_name="Mapper")
+    df_filtered = df[df["Where to Find"] == "Observation"]
+    groupsMapper = df_filtered.groupby("Where to Use")
 
-            # ambil type data yang ingin di cari
-            # typeDataFind = row["Type of Find Used"]
-            # if typeDataFind != "array":
-            #     if pd.notna(row["What to Use Third"]):
-            #         # if typeDataUse == "string":
-            #         target[row["What to Use First"]][row["What to Use Second"]][row["What to Use Third"]] = getFindValue(row, fhirObjDict)[typeDataUse]
-            #     elif pd.notna(row["What to Use Second"]):
-            #         # if typeDataUse == "string":
-            #         target[row["What to Use First"]][row["What to Use Second"]] = getFindValue(row, fhirObjDict)[typeDataUse]
-            #     elif pd.notna(row["What to Use First"]):
-            #         # if typeDataUse == "string":
-            #         target[row["What to Use First"]] = getFindValue(row, fhirObjDict)[typeDataUse]
+    for key, group in groupsMapper:
+        if key not in beacon:
+            beacon[key] = []
 
+        target = {}
+        # get first object if exists
+        if beacon[key]:
+            target = beacon[key][0]
+
+        for _, row in group.iterrows():            
+            target = mapFhirToBeacon(row, target, fhirObjDict, df_filtered)
+
+        if beacon[key]:
+            beacon[key][0] = target
+        else:
+            beacon[key].append(target)
+
+    return beacon
+
+def mapFhirToBeacon(row, target, fhirObjDict, df):
+    # get instruction and set value
+    whatToDoFind = row["What to Do"]
+    if pd.isna(whatToDoFind):
+        value = getFhirValue(fhirObjDict, row)
+        setBeaconValue(row, target, value)
+    else:
+        isValid = True
+        valueToInput = []
+        arrToDo = whatToDoFind.split('||')
+        for toDo in arrToDo:
+            if isValid:
+                if "VALIDATE" in toDo:
+                    arrToFind = toDo.split('|')[1].split(',') # category-array, coding-array
+                    valToFind = toDo.split('|')[2]
+
+                    resultValidate = False
+                    if validate_nested(fhirObjDict[arrToFind[0].split('-')[0]], arrToFind[1:], valToFind):
+                            resultValidate = True
+
+                    if not resultValidate:
+                        print("Data Not Valid")
+                        isValid = False
+                        break
+                elif "COMBINENEXT" in toDo:
+                    totalRowToCombined = toDo.split('-')[1]
+                    for i in range(1, int(totalRowToCombined)):
+                        nextRow = df.iloc[df.index.get_loc(row.name) + i]
+                        nextValue = getFhirValue(fhirObjDict, nextRow)
+                        if (nextValue is not None):
+                            valueToInput.append({
+                                "row": nextRow,
+                                "value": nextValue
+                            })
+                elif "COMBINED" in toDo:
+                    isValid = False
+                    break
+        if isValid:
+            value = getFhirValue(fhirObjDict, row)
+            valueToInput.insert(0, {
+                "row": row,
+                "value": value
+            })
+            setBeaconArrayValue(target, valueToInput)
+            # for item in valueToInput:
+            #     setBeaconValue(item["row"], target, item["value"])
+
+    return target
+        
+def getFhirValue(fhirObjDict, row):
+    # temp value
+    value = {
+        "object": {},
+        "array": [],
+        "string": "",
+        "number": 0,
+        "float": 0,
+        "boolean": False,
+        "null": None
+    }
+    typeFind = row["Type of Find Used"]
+
+    # get value from fhir
+    first = row["What to Find First"]
+    second = row["What to Find Second"]
+    third = row["What to Find Third"]
+
+    if pd.notna(third):
+        value[typeFind] = fhirObjDict.get(first, {}).get(second, {}).get(third)
+    elif pd.notna(second):
+        value[typeFind] = fhirObjDict.get(first, {}).get(second)
+    elif pd.notna(first):
+        value[typeFind] = fhirObjDict.get(first)
+
+    return value[typeFind]
 
 def setBeaconValue(row, target, value):
-    if pd.notna(row["What to Use Third"]):
-        # if typeDataUse == "string":
-        setNested(target, [row["What to Use First"], [row["What to Use Second"]], [row["What to Use Third"]]], value)
-    elif pd.notna(row["What to Use Second"]):
-        # if typeDataUse == "string":
-        setNested(target, [row["What to Use First"], [row["What to Use Second"]]], value)
-    elif pd.notna(row["What to Use First"]):
-        # if typeDataUse == "string":
-        setNested(target, [row["What to Use First"]], value)
+    valueToInput = value
+    typeUsed = row["Type of Use Used"]
+    if typeUsed == "object":
+        toDo = row["What Must Be Done"]
+        if toDo and not pd.isna(toDo):
+            arrToDo = toDo.split('|')
+            if "TRANSFORM" in arrToDo[0]:
+                arrValTransform = arrToDo[0].split('-')
+                arrTransformKey = arrValTransform[1].split(',')
+
+                arrActionDetail = arrToDo[1].split('-')
+                if "Default Value" in arrActionDetail[0]:
+                    keyCol = arrActionDetail[0].split(',')[0]
+                    keyToFind = arrActionDetail[1].split(',')[1]
+                    
+                    jsonData = json.loads(row[keyCol])
+                    matched = next((item for item in jsonData if item[keyToFind] == value), None)
+
+                    colGet = arrActionDetail[1].split(',')
+                    valueToInput = {k: matched[c] for k, c in zip(arrTransformKey, colGet)}
+                elif "Coding" in arrActionDetail[0]:
+                    defVal = [{"system":"http://snomed.info/sct","value":"SNOMED"},{"system":"http://hl7.org/fhir/sid/icd-10","value":"ICD-10"},{"system":"http://loinc.org","value":"LOINC"},{"system":"http://unitsofmeasure.org","value":"UCUM"},{"system":"http://hl7.org/fhir/sid/icd-9-cm","value":"ICD-9-CM"}]
+                    codeUnit = next((item["value"] for item in defVal if item["system"] == value["system"]), None)
+                    valueToInput = {arrTransformKey[0]: f"{codeUnit}:{value["code"]}", arrTransformKey[1]: value["display"]}
+                elif "Value" in arrActionDetail[0]:
+                    defVal = [{"system":"http://snomed.info/sct","value":"SNOMED"},{"system":"http://hl7.org/fhir/sid/icd-10","value":"ICD-10"},{"system":"http://loinc.org","value":"LOINC"},{"system":"http://unitsofmeasure.org","value":"UCUM"},{"system":"http://hl7.org/fhir/sid/icd-9-cm","value":"ICD-9-CM"}]
+                    codeUnit = next((item["value"] for item in defVal if item["system"] == value["system"]), None)
+                    valueToInput = {arrTransformKey[0]: f"{codeUnit}:{value["code"]}", arrTransformKey[1]: value["value"]}
+    elif typeUsed == "array":
+        valueToInput = []
+        toDo = row["What Must Be Done"]
+        if toDo and not pd.isna(toDo):
+            arrToDo = toDo.split('|')
+            if "TRANSFORM" in arrToDo[0]:
+                arrValTransform = arrToDo[0].split('-')
+                arrTransformKey = arrValTransform[1].split(',')
+
+                arrActionDetail = arrToDo[1].split('-')
+                if "Default Value" in arrActionDetail[0]:
+                    keyCol = arrActionDetail[0].split(',')[0]
+                    keyToFind = arrActionDetail[1].split(',')[1]
+                    
+                    jsonData = json.loads(row[keyCol])
+                    matched = next((item for item in jsonData if item[keyToFind] == value), None)
+
+                    colGet = arrActionDetail[1].split(',')
+                    valueToInput.append({k: matched[c] for k, c in zip(arrTransformKey, colGet)})
+                elif "Coding" in arrActionDetail[0]:
+                    defVal = [{"system":"http://snomed.info/sct","value":"SNOMED"},{"system":"http://hl7.org/fhir/sid/icd-10","value":"ICD-10"},{"system":"http://loinc.org","value":"LOINC"},{"system":"http://unitsofmeasure.org","value":"UCUM"},{"system":"http://hl7.org/fhir/sid/icd-9-cm","value":"ICD-9-CM"}]
+                    for arrVal in value:
+                        codeUnit = next((item["value"] for item in defVal if item["system"] == arrVal["system"]), None)
+                        valueToInput.append({arrTransformKey[0]: f"{codeUnit}:{arrVal["code"]}", arrTransformKey[1]: arrVal["display"]})
+                elif "Value" in arrActionDetail[0]:
+                    defVal = [{"system":"http://snomed.info/sct","value":"SNOMED"},{"system":"http://hl7.org/fhir/sid/icd-10","value":"ICD-10"},{"system":"http://loinc.org","value":"LOINC"},{"system":"http://unitsofmeasure.org","value":"UCUM"},{"system":"http://hl7.org/fhir/sid/icd-9-cm","value":"ICD-9-CM"}]
+                    codeUnit = next((item["value"] for item in defVal if item["system"] == value["system"]), None)
+                    valueToInput.append({arrTransformKey[0]: f"{codeUnit}:{value["code"]}", arrTransformKey[1]: value["value"]})
     
+    if pd.notna(row["What to Use Third"]):
+        setNested(target, [row["What to Use First"], [row["What to Use Second"]], [row["What to Use Third"]]], valueToInput, as_list=(typeUsed == "array"))
+    elif pd.notna(row["What to Use Second"]):
+        setNested(target, [row["What to Use First"], [row["What to Use Second"]]], valueToInput, as_list=(typeUsed == "array"))
+    elif pd.notna(row["What to Use First"]):
+        setNested(target, [row["What to Use First"]], valueToInput, as_list=(typeUsed == "array"))
+    
+def setBeaconArrayValue(target, arrValue):
+    arrValueToInput = {}
+    firstRow = arrValue[0]
+    for item in arrValue[1:]:
+        row = item["row"]
+        value = item["value"]
+
+        valueToInput = value
+        typeUsed = row["Type of Use Used"]
+        if typeUsed == "object":
+            toDo = row["What Must Be Done"]
+            if toDo and not pd.isna(toDo):
+                arrToDo = toDo.split('|')
+                if "TRANSFORM" in arrToDo[0]:
+                    arrValTransform = arrToDo[0].split('-')
+                    arrTransformKey = arrValTransform[1].split(',')
+
+                    arrActionDetail = arrToDo[1].split('-')
+                    if "Default Value" in arrActionDetail[0]:
+                        keyCol = arrActionDetail[0].split(',')[0]
+                        keyToFind = arrActionDetail[1].split(',')[1]
+                        
+                        jsonData = json.loads(row[keyCol])
+                        matched = next((item for item in jsonData if item[keyToFind] == value), None)
+
+                        colGet = arrActionDetail[1].split(',')
+                        valueToInput = {k: matched[c] for k, c in zip(arrTransformKey, colGet)}
+                    elif "Coding" in arrActionDetail[0]:
+                        defVal = [{"system":"http://snomed.info/sct","value":"SNOMED"},{"system":"http://hl7.org/fhir/sid/icd-10","value":"ICD-10"},{"system":"http://loinc.org","value":"LOINC"},{"system":"http://unitsofmeasure.org","value":"UCUM"},{"system":"http://hl7.org/fhir/sid/icd-9-cm","value":"ICD-9-CM"}]
+                        if len(value) > 0:
+                            codeUnit = next((item["value"] for item in defVal if item["system"] == value[0]["system"]), None)
+                            valueToInput = {arrTransformKey[0]: f"{codeUnit}:{value[0]["code"]}", arrTransformKey[1]: value[0]["display"]}
+                        else:
+                            codeUnit = next((item["value"] for item in defVal if item["system"] == value["system"]), None)
+                            valueToInput = {arrTransformKey[0]: f"{codeUnit}:{value["code"]}", arrTransformKey[1]: value["display"]}
+                    elif "Value" in arrActionDetail[0]:
+                        defVal = [{"system":"http://snomed.info/sct","value":"SNOMED"},{"system":"http://hl7.org/fhir/sid/icd-10","value":"ICD-10"},{"system":"http://loinc.org","value":"LOINC"},{"system":"http://unitsofmeasure.org","value":"UCUM"},{"system":"http://hl7.org/fhir/sid/icd-9-cm","value":"ICD-9-CM"}]
+                        codeUnit = next((item["value"] for item in defVal if item["system"] == value["system"]), None)
+                        valueToInput = {arrTransformKey[0]: f"{codeUnit}:{value["code"]}", arrTransformKey[1]: value["value"]}
+
+        if pd.notna(row["What to Use Third"]):
+            setNested(arrValueToInput, [row["What to Use Second"], row["What to Use Third"]], valueToInput)
+        elif pd.notna(row["What to Use Second"]):
+            setNested(arrValueToInput, [row["What to Use Second"]], valueToInput)
+        # elif pd.notna(row["What to Use First"]):
+        #     setNested(arrValueToInput, [row["What to Use First"]], valueToInput)
+
+    setNested(target, [firstRow["row"]["What to Use First"]], arrValueToInput, as_list=True)
 
 def setNested(target, keys, value, as_list=False):
     d = target
@@ -141,3 +308,44 @@ def setNested(target, keys, value, as_list=False):
     else:
         # level terakhir adalah dict/object atau value biasa
         d[last_key] = value
+
+def validate_nested(val, keyPaths, target):
+    if not keyPaths:
+        # sudah sampai key terakhir, cek apakah val sama dengan target
+        return val == target
+    
+    for path in keyPaths:
+        keyPath = path.split('-')
+        key = keyPath[0]
+        subtype = keyPath[1] if len(keyPath) > 1 else None
+
+        if isinstance(val, dict):
+            next_val = val.get(key)
+            if next_val is None:
+                return False
+            if subtype == "array" and isinstance(next_val, list):
+                for item in next_val:
+                    if validate_nested(item, keyPaths[1:], target):
+                        return True
+            else:
+                return validate_nested(next_val, keyPaths[1:], target)
+        elif isinstance(val, list):
+            for item in val:
+                if validate_nested(item, keyPaths, target):
+                    return True
+
+    return False
+
+def validate_todo(toDo, val, row):
+    toDoList = toDo.split('|')
+    if "VALIDATE" in toDoList[0]:
+        arrToFind = toDoList[1].split(',')
+        valToFind = toDoList[2]
+
+        for path in arrToFind:
+            if not validate_nested(val, path, valToFind):
+                return "Data Not Valid"
+    elif "COMBINENEXT" in toDoList[0]:
+        totalRowToCombined = toDoList[1].split('-')[1]
+        for i in range(1, int(totalRowToCombined)):
+            row[i]
