@@ -4,6 +4,7 @@ import zipfile
 import shutil
 import pandas as pd
 
+target = {}
 pathBeaconDir = os.path.join(os.getcwd(), 'Beacon')
 os.makedirs(pathBeaconDir, exist_ok=True) 
 
@@ -58,53 +59,85 @@ def processPatient(beacon, fhirObj):
     fhirObjDict = fhirObj.model_dump()
     mapper_path = os.path.join(os.getcwd(), "Mapper.xlsx")
     df = pd.read_excel(mapper_path, sheet_name="Mapper")
+    df_patient = df[df["a"] == "Patient"]
+    groupsMapper = df_patient.groupby("b")
 
-    for index, row in df.iterrows():
-        if row['Where to Use'] not in beacon:
-            beacon[row['Where to Use']] = []
-        
-        if row['Where to Find'] == "Patient":
-            typeDataFind = row["Type of Find Used"]
-            if typeDataFind != "array":
-                typeDataUse = row["Type of Use Used"]
-                if pd.notna(row["What to Use Third"]):
-                    # if typeDataUse == "string":
-                    beacon[row['Where to Use']][row["What to Use Second"]][row["What to Use Third"]] = getFindValue(row, fhirObjDict)[typeDataUse]
-                elif pd.notna(row["What to Use Second"]):
-                    # if typeDataUse == "string":
-                    beacon[row['Where to Use']][row["What to Use Second"]] = getFindValue(row, fhirObjDict)[typeDataUse]
-                elif pd.notna(row["What to Use First"]):
-                    # if typeDataUse == "string":
-                    beacon[row['Where to Use']] = getFindValue(row, fhirObjDict)[typeDataUse]
+    for key, group in groupsMapper:
+        if key not in beacon:
+            beacon[key] = []
+
+        target = {}
+        # get first object if exists
+        if beacon[key]:
+            target = beacon[key][0]
+
+        for _, row in group.iterrows():
+            # temp value
+            value = {
+                "object": {},
+                "array": [],
+                "string": "",
+                "number": 0,
+                "float": 0,
+                "boolean": False,
+                "null": None
+            }
+
+            # get value from fhir
+            typeFind = row["Type of Find Used"]
+            if pd.notna(row["What to Find Third"]):
+                value[typeFind] = fhirObjDict[row["What to Find First"]][row["What to Find Second"]][row["What to Find Third"]]
+            elif pd.notna(row["What to Find Second"]):
+                value[typeFind] = fhirObjDict[row["What to Find First"]][row["What to Find Second"]]
+            elif pd.notna(row["What to Find First"]):
+                value[typeFind] = fhirObjDict[row["What to Find First"]]
+
+            # get instruction and set value
+            whatToDoFind = row["What to Do"]
+            if not whatToDoFind:
+                setBeaconValue(row, target, value[typeFind])
+            else:
+                arrToDo = whatToDoFind.split('|')
+            # typeDataFind = row["Type of Find Used"]
+            # if typeDataFind == "string":
 
 
-def getFindValue(row, fhirObjDict):
-    vm = {
-        "string": "",
-        "number": 0,
-        "float": 0.0,
-        "object": {},
-        "array": []
-    }
+            # ambil type data yang ingin di cari
+            # typeDataFind = row["Type of Find Used"]
+            # if typeDataFind != "array":
+            #     if pd.notna(row["What to Use Third"]):
+            #         # if typeDataUse == "string":
+            #         target[row["What to Use First"]][row["What to Use Second"]][row["What to Use Third"]] = getFindValue(row, fhirObjDict)[typeDataUse]
+            #     elif pd.notna(row["What to Use Second"]):
+            #         # if typeDataUse == "string":
+            #         target[row["What to Use First"]][row["What to Use Second"]] = getFindValue(row, fhirObjDict)[typeDataUse]
+            #     elif pd.notna(row["What to Use First"]):
+            #         # if typeDataUse == "string":
+            #         target[row["What to Use First"]] = getFindValue(row, fhirObjDict)[typeDataUse]
 
-    typeDataUse = row["Type of Use Used"]
-    typeDataFind = row["Type of Find Used"]
-    if typeDataFind == typeDataUse:
-        if pd.notna(row["What to Find Third"]):
-            value = fhirObjDict[row["What to Find First"]][row["What to Find Second"]][row["What to Find Third"]]
-            if value is not None:
-                vm[typeDataFind] = value
-        elif pd.notna(row["What to Find Second"]):
-            value = fhirObjDict[row["What to Find First"]][row["What to Find Second"]]
-            if value is not None:
-                vm[typeDataFind] = value
-        elif pd.notna(row["What to Find First"]):
-            value = fhirObjDict[row["What to Find First"]]
-            if value is not None:
-                vm[typeDataFind] = value
-    elif typeDataFind != typeDataUse:
-        if typeDataUse != "array":
-            aaa = ""
 
-    return vm
+def setBeaconValue(row, target, value):
+    if pd.notna(row["What to Use Third"]):
+        # if typeDataUse == "string":
+        setNested(target, [row["What to Use First"], [row["What to Use Second"]], [row["What to Use Third"]]], value)
+    elif pd.notna(row["What to Use Second"]):
+        # if typeDataUse == "string":
+        setNested(target, [row["What to Use First"], [row["What to Use Second"]]], value)
+    elif pd.notna(row["What to Use First"]):
+        # if typeDataUse == "string":
+        setNested(target, [row["What to Use First"]], value)
     
+
+def setNested(target, keys, value, as_list=False):
+    d = target
+    for key in keys[:-1]:
+        # pastikan level dict ada
+        d = d.setdefault(key, {})
+    
+    last_key = keys[-1]
+    if as_list:
+        # jika level terakhir adalah list
+        d.setdefault(last_key, []).append(value)
+    else:
+        # level terakhir adalah dict/object atau value biasa
+        d[last_key] = value
