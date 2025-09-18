@@ -60,7 +60,7 @@ def validate_fhir_resource(json_file):
                 result = False, file_path
     return result
 
-def process_fhir_resource(beacon, file_path):
+def process_fhir_resource(beacon, file_path, index):
     with open(file_path, 'r', encoding='utf-8') as f:
         json_data = json.load(f)
 
@@ -74,22 +74,27 @@ def process_fhir_resource(beacon, file_path):
         resource_type = resource_json.get("resourceType")
         if resource_type == "Patient":
             obj = Patient.model_validate_json(json.dumps(resource_json))
-            beacon = YamlToBeaconConverter.processPatient(beacon, obj)
+            beacon = YamlToBeaconConverter.processPatient(beacon, obj, index)
         elif resource_type == "Procedure":
-            obj = Procedure.model_validate_json(json.dumps(resource_json))
+            beacon = YamlToBeaconConverter.processProcedure(beacon, resource_json, index)
+            # obj = Procedure.model_validate_json(json.dumps(resource_json))
         elif resource_type == "Condition":
             obj = Condition.model_validate_json(json.dumps(resource_json))
+            beacon = YamlToBeaconConverter.processCondition(beacon, obj, index)
         elif resource_type == "Observation":
             obj = Observation.model_validate_json(json.dumps(resource_json))
-            beacon = YamlToBeaconConverter.processObservation(beacon, obj)
+            beacon = YamlToBeaconConverter.processObservation(beacon, obj, index)
         elif resource_type == "AllergyIntolerance":
-            obj = AllergyIntolerance.model_validate_json(json.dumps(resource_json))
+            aaa = ""
+            # obj = AllergyIntolerance.model_validate_json(json.dumps(resource_json))
         elif resource_type == "MedicationRequest":
-            obj = MedicationRequest.model_validate_json(json.dumps(resource_json))
+            aa = ""
+            # obj = MedicationRequest.model_validate_json(json.dumps(resource_json))
         elif resource_type == "Immunization":
             obj = Immunization.model_validate_json(json.dumps(resource_json))
         else:
             invalid_count += 1
-            continue
+            
+    return beacon
 
     

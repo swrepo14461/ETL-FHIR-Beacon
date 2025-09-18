@@ -1,6 +1,8 @@
 import os
 import FHIRProcess
-import YamlToBeaconConverter
+import json
+from collections import OrderedDict
+from datetime import datetime
 
 jsonFiles = []
 pathFhirJsonDir = os.path.join(os.getcwd(), 'FHIR Json')
@@ -48,5 +50,12 @@ beacon = {
         "version": "v1.1"
     },
 }
-for filesTobeacon in valid_files:
-    FHIRProcess.process_fhir_resource(beacon, filesTobeacon)
+for idx, filesTobeacon in enumerate(valid_files):
+    beacon = FHIRProcess.process_fhir_resource(beacon, filesTobeacon, idx)
+    pathResult = os.path.join(os.getcwd(), 'Result')
+    os.makedirs(pathResult, exist_ok=True)
+
+filename = f"Beacon_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')}.json"
+result_file = os.path.join(pathResult, filename)
+with open(result_file, 'w') as out_f:
+    out_f.write(json.dumps(OrderedDict(beacon), indent=4, sort_keys=True, default=str))
