@@ -341,20 +341,39 @@ def setBeaconValue(row, target, value, skipFirst: False):
             setNested(target, [row["What to Use First"]], valueToInput)
     
 def setBeaconArrayValue(target, arrValue):
-    arrValueToInput = {}
     firstRow = arrValue[0]
-    for item in arrValue[1:]:
-        row = item["row"]
-        value = item["value"]
-        if isinstance(value, list):
-            setBeaconValue(row, arrValueToInput, value[0], True)
+    secondRow = arrValue[1]
+    if isinstance(secondRow["value"], list):
+        arrValueToInput = []
+        dictValueToInput = {}
+        for item in arrValue[1:]:
+            row = item["row"]
+            value = item["value"]
+            if isinstance(value, list):
+                for val in value:
+                    tempDictValueToInput = {}
+                    setBeaconValue(row, tempDictValueToInput, val, True)
+                    arrValueToInput.append(tempDictValueToInput)
+            else:
+                setBeaconValue(row, dictValueToInput, value, True)
+
+        if len(arrValueToInput) > 0:
+            for dictItem in arrValueToInput:
+                dictItem.update(dictValueToInput)
+            setNested(target, [firstRow["row"]["What to Use First"]], arrValueToInput, as_list=True, doExtend=True)
         else:
+            setNested(target, [firstRow["row"]["What to Use First"]], dictValueToInput, as_list=True, doExtend=False)
+    else:
+        arrValueToInput = {}
+        for item in arrValue[1:]:
+            row = item["row"]
+            value = item["value"]
             setBeaconValue(row, arrValueToInput, value, True)
 
-    setNested(target, [firstRow["row"]["What to Use First"]], arrValueToInput, as_list=True)
+        setNested(target, [firstRow["row"]["What to Use First"]], arrValueToInput, as_list=True, doExtend=False)
 
 #Helper
-def setNested(target, keys, value, as_list=False):
+def setNested(target, keys, value, as_list=False, doExtend=False):
     d = target
     for key in keys[:-1]:
         # pastikan level dict ada
@@ -363,7 +382,10 @@ def setNested(target, keys, value, as_list=False):
     last_key = keys[-1]
     if as_list:
         # jika level terakhir adalah list
-        d.setdefault(last_key, []).append(value)
+        if doExtend and isinstance(value, list):
+            d.setdefault(last_key, []).extend(value)
+        else:
+            d.setdefault(last_key, []).append(value)
     else:
         # level terakhir adalah dict/object atau value biasa
         d[last_key] = value
