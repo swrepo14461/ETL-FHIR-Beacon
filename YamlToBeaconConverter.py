@@ -240,7 +240,7 @@ def getFhirValue(fhirObjDict, row):
     return value[typeFind]
 
 def setBeaconValue(row, target, value, skipFirst: False):
-    defVal = [{"system":"http://snomed.info/sct","value":"SNOMED"},{"system":"http://hl7.org/fhir/sid/icd-10","value":"ICD-10"},{"system":"http://loinc.org","value":"LOINC"},{"system":"http://unitsofmeasure.org","value":"UCUM"},{"system":"http://hl7.org/fhir/sid/icd-9-cm","value":"ICD-9-CM"}]
+    defVal = [{"system":"http://snomed.info/sct","code":"SNOMED"},{"system":"http://loinc.org","code":"LOINC"},{"system":"http://unitsofmeasure.org","code":"UCUM"},{"system":"http://terminology.hl7.org/CodeSystem/condition-category","code":"HL7"},{"system":"http://hl7.org/fhir/sid/icd-10","code":"ICD10"},{"system":"http://www.whocc.no/atc","code":"WHO"},{"system":"http://terminology.kemkes.go.id/CodeSystem/clinical-term","code":"KEMKES"},{"system":"http://sys-ids.kemkes.go.id/kfa","code":"KFA"},{"system":"http://hl7.org/fhir/sid/icd-9-cm","code":"ICD9CM"},{"system":"http://terminology.kemkes.go.id/CodeSystem/icd-o-topography","code":"KEMKES"},{"system":"http://terminology.kemkes.go.id/CodeSystem/icd-o-morphology","code":"KEMKES"},{"system":"http://terminology.kemkes.go.id/CodeSystem/cancer-t-category","code":"KEMKES"},{"system":"http://terminology.kemkes.go.id/CodeSystem/cancer-n-category","code":"KEMKES"},{"system":"http://terminology.kemkes.go.id/CodeSystem/cancer-m-category","code":"KEMKES"},{"system":"http://terminology.kemkes.go.id/CodeSystem/examination","code":"KEMKES"}]
 
     valueToInput = {}
     typeUsed = row["Type of Use Used"]
@@ -282,6 +282,9 @@ def setBeaconValue(row, target, value, skipFirst: False):
                         keyToFind = arrActionDetail[1].split(',')[0]
                         keyToGet = arrActionDetail[1].split(',')[1]
 
+                        if pd.notna(row["Default Value"]):
+                            defVal = row["Default Value"]
+
                         codeUnit = next((item[keyToGet] for item in defVal if item[keyToFind] == value[keyToFind]), None)
                         
                         colGet = arrActionDetail[2].split(',')
@@ -297,6 +300,10 @@ def setBeaconValue(row, target, value, skipFirst: False):
                     elif "Value" in arrActionDetail[0]:
                         keyToFind = arrActionDetail[1].split(',')[0]
                         keyToGet = arrActionDetail[1].split(',')[1]
+
+                        if pd.notna(row["Default Value"]):
+                            defVal = row["Default Value"]
+
                         codeUnit = next((item[keyToGet] for item in defVal if item[keyToFind] == value[keyToFind]), None)
 
                         colGet = arrActionDetail[2].split(',')
