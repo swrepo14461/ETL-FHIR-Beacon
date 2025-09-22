@@ -28,28 +28,11 @@ for jsonFile in jsonFiles:
 
 print(f"Validation complete. Valid files: {valid_count}, Invalid files: {invalid_count}")
 print(f"Start processing JSON files...")
-beacon = {
-    "datasetId": "UNQ_1", 
-    "dataset": {
-        "id": "UNQ_1", 
-        "createDateTime": "2021-03-21T02:37:00-08:00",
-        "dataUseConditions": { 
-            "duoDataUse": [
-                {
-                    "id": "DUO:0000042",
-                    "label": "general research use",
-                    "version": "17-07-2016"
-                }
-            ]
-        },
-        "description": "Simulation set 1.",
-        "externalUrl": "http://example.org/wiki/Main_Page",
-        "info": {},
-        "name": "Dataset with fake data",
-        "updateDateTime": "2022-08-05T17:21:00+01:00",
-        "version": "v1.1"
-    },
-}
+
+pathHeader = os.path.join(os.getcwd(), 'HeaderBeacon.json')
+with open(pathHeader, "r", encoding="utf-8") as f:
+    beacon = json.load(f) 
+
 for idx, filesTobeacon in enumerate(valid_files):
     beacon = FHIRProcess.process_fhir_resource(beacon, filesTobeacon, idx)
     pathResult = os.path.join(os.getcwd(), 'Result')

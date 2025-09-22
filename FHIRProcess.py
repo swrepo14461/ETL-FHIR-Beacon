@@ -53,7 +53,7 @@ def validate_fhir_resource(json_file):
             result = False, file_path
         else:
             try: 
-                resource_instance = resource_class.model_validate_json(json_data)
+                # resource_instance = resource_class.model_validate_json(json_data)
                 result = True, file_path
             except Exception as e:
                 print(f"{file_path}: Failed to parse {resource_type}: {e}")
@@ -73,25 +73,21 @@ def process_fhir_resource(beacon, file_path, index):
 
         resource_type = resource_json.get("resourceType")
         if resource_type == "Patient":
-            obj = Patient.model_validate_json(json.dumps(resource_json))
-            beacon = YamlToBeaconConverter.processPatient(beacon, obj, index)
+            beacon = YamlToBeaconConverter.convertFhirToBeacon(beacon, resource_json, index, resource_type)
         elif resource_type == "Procedure":
-            beacon = YamlToBeaconConverter.processProcedure(beacon, resource_json, index)
-            # obj = Procedure.model_validate_json(json.dumps(resource_json))
+            beacon = YamlToBeaconConverter.convertFhirToBeacon(beacon, resource_json, index, resource_type)
         elif resource_type == "Condition":
-            obj = Condition.model_validate_json(json.dumps(resource_json))
-            beacon = YamlToBeaconConverter.processCondition(beacon, obj, index)
+            beacon = YamlToBeaconConverter.convertFhirToBeacon(beacon, resource_json, index, resource_type)
         elif resource_type == "Observation":
-            obj = Observation.model_validate_json(json.dumps(resource_json))
-            beacon = YamlToBeaconConverter.processObservation(beacon, obj, index)
+            beacon = YamlToBeaconConverter.convertFhirToBeacon(beacon, resource_json, index, resource_type)
         elif resource_type == "AllergyIntolerance":
-            aaa = ""
-            # obj = AllergyIntolerance.model_validate_json(json.dumps(resource_json))
-        elif resource_type == "MedicationRequest":
-            aa = ""
-            # obj = MedicationRequest.model_validate_json(json.dumps(resource_json))
-        elif resource_type == "Immunization":
-            obj = Immunization.model_validate_json(json.dumps(resource_json))
+            beacon = YamlToBeaconConverter.convertFhirToBeacon(beacon, resource_json, index, resource_type)
+        elif resource_type == "Medication":
+            beacon = YamlToBeaconConverter.convertFhirToBeacon(beacon, resource_json, index, resource_type)
+        elif resource_type == "MedicationDispense":
+            beacon = YamlToBeaconConverter.convertFhirToBeacon(beacon, resource_json, index, resource_type)
+        elif resource_type == "FamilyMemberHistory":
+            beacon = YamlToBeaconConverter.convertFhirToBeacon(beacon, resource_json, index, resource_type)
         else:
             invalid_count += 1
             

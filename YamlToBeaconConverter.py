@@ -1,92 +1,13 @@
-import requests
 import os
-import zipfile
-import shutil
 import pandas as pd
 import json
 
-target = {}
-pathBeaconDir = os.path.join(os.getcwd(), 'Beacon')
-os.makedirs(pathBeaconDir, exist_ok=True) 
-
-url = "https://github.com/ga4gh-beacon/beacon-v2/archive/refs/tags/v2.2.0.zip"
-save_path = os.path.join(pathBeaconDir, 'Beacon_2_2_0.zip')
-
-def download_beacon():
-    try:
-        if os.path.exists(save_path):
-            return True, "File Already Downloaded"
-        else:
-            r = requests.get(url)
-            with open(save_path, "wb") as f:
-                f.write(r.content)
-            return True, "Beacon File Downloaded"
-    except requests.exceptions.RequestException as e:
-        return False, f"Request error: {e}"
-    except OSError as e:
-        return False, f"File error: {e}"
-    except Exception as e:
-        return False, f"Unexpected error: {e}"
-
-def prepare_beacon():
-    is_downloaded, reason = download_beacon()
-    if not is_downloaded:
-        return False, reason
-    
-    ExtractFolder = os.path.join(pathBeaconDir, "bin")
-    os.makedirs(ExtractFolder, exist_ok=True)
-    if os.listdir(ExtractFolder):
-        return True, "File Exists"
-    
-    tempEkstrakFolder = os.path.join(pathBeaconDir, "temp")
-    os.makedirs(tempEkstrakFolder, exist_ok=True)
-    with zipfile.ZipFile(save_path, "r") as zip_ref:
-        zip_ref.extractall(tempEkstrakFolder)
-
-    itemsToMove = os.listdir(tempEkstrakFolder)
-    if len(itemsToMove) == 1 and os.path.isdir(os.path.join(tempEkstrakFolder, itemsToMove[0])):
-        inner_folder = os.path.join(tempEkstrakFolder, itemsToMove[0])
-        inner_folder_bin = os.path.join(inner_folder, "bin")
-        for item in os.listdir(inner_folder_bin):
-            src = os.path.join(inner_folder_bin, item)
-            dst = os.path.join(ExtractFolder, item)
-            shutil.move(src, dst)
-
-        shutil.rmtree(inner_folder)
-
-    return True, f"Beacon Ready at : {ExtractFolder}"
-    
-def processPatient(beacon, fhirObj, index):
-    fhirObjDict = fhirObj.model_dump()
+def convertFhirToBeacon(beacon, fhirJson, index, typeFhir):
     mapper_path = os.path.join(os.getcwd(), "Mapper.xlsx")
     df = pd.read_excel(mapper_path, sheet_name="Mapper")
-    df_filtered = df[df["Where to Find"] == "Patient"]
-    groupsMapper = df_filtered.groupby("Where to Use")
+    df_filtered = df[df["Where to Find"] == typeFhir]
+    print(f"Processing {typeFhir} at index {index} with {len(df_filtered)} mappings")
 
-    for key, group in groupsMapper:
-        if key not in beacon:
-            beacon[key] = []
-
-        target = {}
-        # get first object if exists
-        if key in beacon and len(beacon[key]) > index and beacon[key][index] is not None:
-            target = beacon[key][index]
-
-        for _, row in group.iterrows():
-            mapFhirToBeacon(row, target, fhirObjDict, df_filtered)
-
-        if key in beacon and len(beacon[key]) > index and beacon[key][index] is not None:
-            beacon[key][index] = target
-        else:
-            beacon[key].append(target)
-
-    return beacon
-
-def processObservation(beacon, fhirObj, index):
-    fhirObjDict = fhirObj.model_dump()
-    mapper_path = os.path.join(os.getcwd(), "Mapper.xlsx")
-    df = pd.read_excel(mapper_path, sheet_name="Mapper")
-    df_filtered = df[df["Where to Find"] == "Observation"]
     groupsMapper = df_filtered.groupby("Where to Use")
 
     for key, group in groupsMapper:
@@ -99,59 +20,7 @@ def processObservation(beacon, fhirObj, index):
             target = beacon[key][index]
 
         for _, row in group.iterrows():            
-            target = mapFhirToBeacon(row, target, fhirObjDict, df_filtered)
-
-        if key in beacon and len(beacon[key]) > index and beacon[key][index] is not None:
-            beacon[key][index] = target
-        else:
-            beacon[key].append(target)
-
-    return beacon
-
-def processCondition(beacon, fhirObj, index):
-    fhirObjDict = fhirObj.model_dump()
-    mapper_path = os.path.join(os.getcwd(), "Mapper.xlsx")
-    df = pd.read_excel(mapper_path, sheet_name="Mapper")
-    df_filtered = df[df["Where to Find"] == "Condition"]
-    groupsMapper = df_filtered.groupby("Where to Use")
-
-    for key, group in groupsMapper:
-        if key not in beacon:
-            beacon[key] = []
-
-        target = {}
-        # get first object if exists
-        if key in beacon and len(beacon[key]) > index and beacon[key][index] is not None:
-            target = beacon[key][index]
-
-        for _, row in group.iterrows():            
-            target = mapFhirToBeacon(row, target, fhirObjDict, df_filtered)
-
-        if key in beacon and len(beacon[key]) > index and beacon[key][index] is not None:
-            beacon[key][index] = target
-        else:
-            beacon[key].append(target)
-
-    return beacon
-
-def processProcedure(beacon, fhirJson, index):
-    fhirObjDict = fhirJson
-    mapper_path = os.path.join(os.getcwd(), "Mapper.xlsx")
-    df = pd.read_excel(mapper_path, sheet_name="Mapper")
-    df_filtered = df[df["Where to Find"] == "Procedure"]
-    groupsMapper = df_filtered.groupby("Where to Use")
-
-    for key, group in groupsMapper:
-        if key not in beacon:
-            beacon[key] = []
-
-        target = {}
-        # get first object if exists
-        if key in beacon and len(beacon[key]) > index and beacon[key][index] is not None:
-            target = beacon[key][index]
-
-        for _, row in group.iterrows():            
-            target = mapFhirToBeacon(row, target, fhirObjDict, df_filtered)
+            target = mapFhirToBeacon(row, target, fhirJson, df_filtered)
 
         if key in beacon and len(beacon[key]) > index and beacon[key][index] is not None:
             beacon[key][index] = target
@@ -179,23 +48,49 @@ def mapFhirToBeacon(row, target, fhirObjDict, df):
                     valToFind = toDo.split('|')[2]
 
                     resultValidate = False
-                    if validate_nested(fhirObjDict[arrToFind[0].split('-')[0]], arrToFind[1:], valToFind):
-                            resultValidate = True
+                    root_val = fhirObjDict.get(arrToFind[0].split('-')[0])
+
+                    if root_val is not None and validate_nested(root_val, arrToFind[1:], valToFind):
+                        resultValidate = True
 
                     if not resultValidate:
                         print("Data Not Valid")
                         isValid = False
                         break
                 elif "COMBINENEXT" in toDo:
-                    totalRowToCombined = toDo.split('-')[1]
+                    firstCommand = toDo
+                    rowNum = None
+                    if '|' in toDo:
+                        firstCommand = toDo.split('|')[0]
+                        arrToFind = toDo.split('|')[1].split('-')
+                        if arrToFind[0] == "GET":
+                            try:
+                                rowNum = int(arrToFind[1])
+                            except ValueError:
+                                rowNum = None
+
+                    totalRowToCombined = firstCommand.split('-')[1]
                     for i in range(1, int(totalRowToCombined) + 1):
                         nextRow = df.iloc[df.index.get_loc(row.name) + i]
                         nextValue = getFhirValue(fhirObjDict, nextRow)
-                        if (nextValue is not None):
-                            valueToInput.append({
-                                "row": nextRow,
-                                "value": nextValue
-                            })
+                        if rowNum == None or i < rowNum:
+                            if (nextValue is not None):
+                                valueToInput.append({
+                                    "row": nextRow,
+                                    "value": nextValue
+                                })
+                        elif rowNum == i:
+                            if (nextValue is not None):
+                                valFind = [
+                                    coding
+                                    for obj in nextValue if arrToFind[2] in obj
+                                    for coding in obj[arrToFind[2]][arrToFind[3]]
+                                ]
+                                valueToInput.append({
+                                    "row": nextRow,
+                                    "value": valFind
+                                })
+
                 elif "COMBINED" in toDo:
                     isValid = False
                     break
@@ -206,9 +101,8 @@ def mapFhirToBeacon(row, target, fhirObjDict, df):
                     "row": row,
                     "value": value
                 })
-                setBeaconArrayValue(target, valueToInput)
-            # for item in valueToInput:
-            #     setBeaconValue(item["row"], target, item["value"])
+
+            setBeaconArrayValue(target, valueToInput)
 
     return target
         
@@ -283,7 +177,7 @@ def setBeaconValue(row, target, value, skipFirst: False):
                         keyToGet = arrActionDetail[1].split(',')[1]
 
                         if pd.notna(row["Default Value"]):
-                            defVal = row["Default Value"]
+                            defVal = json.loads(row["Default Value"])
 
                         codeUnit = next((item[keyToGet] for item in defVal if item[keyToFind] == value[keyToFind]), None)
                         
@@ -302,7 +196,7 @@ def setBeaconValue(row, target, value, skipFirst: False):
                         keyToGet = arrActionDetail[1].split(',')[1]
 
                         if pd.notna(row["Default Value"]):
-                            defVal = row["Default Value"]
+                            defVal = json.loads(row["Default Value"])
 
                         codeUnit = next((item[keyToGet] for item in defVal if item[keyToFind] == value[keyToFind]), None)
 
@@ -349,35 +243,50 @@ def setBeaconValue(row, target, value, skipFirst: False):
     
 def setBeaconArrayValue(target, arrValue):
     firstRow = arrValue[0]
-    secondRow = arrValue[1]
-    if isinstance(secondRow["value"], list):
-        arrValueToInput = []
-        dictValueToInput = {}
-        for item in arrValue[1:]:
-            row = item["row"]
-            value = item["value"]
-            if isinstance(value, list):
-                for val in value:
-                    tempDictValueToInput = {}
-                    setBeaconValue(row, tempDictValueToInput, val, True)
-                    arrValueToInput.append(tempDictValueToInput)
+    if len(arrValue) > 1:
+        if any(isinstance(row.get("value"), list) for row in arrValue):
+            arrValueToInput = []
+            dictValueToInput = {}
+            for item in arrValue[1:]:
+                row = item["row"]
+                value = item["value"]
+                if isinstance(value, list):
+                    if (row["Type of Use Used"] == "array"):
+                        arrTempVal = []
+                        for val in value:
+                            tempDictValueToInput = {}
+                            setBeaconValue({
+                                "What to Use Third": None,
+                                "What to Use Second": "root",
+                                "Type of Use Used": "object",
+                                "What Must Be Done": row["What Must Be Done"],
+                                "Default Value": row["Default Value"]
+                            }, tempDictValueToInput, val, True)
+                            arrTempVal.append(tempDictValueToInput["root"])
+                        
+                        dictValueToInput[row["What to Use Second"]] = arrTempVal
+                    else:
+                        for val in value:
+                            tempDictValueToInput = {}
+                            setBeaconValue(row, tempDictValueToInput, val, True)
+                            arrValueToInput.append(tempDictValueToInput)
+                else:
+                    setBeaconValue(row, dictValueToInput, value, True)
+
+            if len(arrValueToInput) > 0:
+                for dictItem in arrValueToInput:
+                    dictItem.update(dictValueToInput)
+                setNested(target, [firstRow["row"]["What to Use First"]], arrValueToInput, as_list=True, doExtend=True)
             else:
-                setBeaconValue(row, dictValueToInput, value, True)
-
-        if len(arrValueToInput) > 0:
-            for dictItem in arrValueToInput:
-                dictItem.update(dictValueToInput)
-            setNested(target, [firstRow["row"]["What to Use First"]], arrValueToInput, as_list=True, doExtend=True)
+                setNested(target, [firstRow["row"]["What to Use First"]], dictValueToInput, as_list=True, doExtend=False)
         else:
-            setNested(target, [firstRow["row"]["What to Use First"]], dictValueToInput, as_list=True, doExtend=False)
-    else:
-        arrValueToInput = {}
-        for item in arrValue[1:]:
-            row = item["row"]
-            value = item["value"]
-            setBeaconValue(row, arrValueToInput, value, True)
+            arrValueToInput = {}
+            for item in arrValue[1:]:
+                row = item["row"]
+                value = item["value"]
+                setBeaconValue(row, arrValueToInput, value, True)
 
-        setNested(target, [firstRow["row"]["What to Use First"]], arrValueToInput, as_list=True, doExtend=False)
+            setNested(target, [firstRow["row"]["What to Use First"]], arrValueToInput, as_list=True, doExtend=False)
 
 #Helper
 def setNested(target, keys, value, as_list=False, doExtend=False):
