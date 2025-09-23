@@ -93,4 +93,24 @@ def process_fhir_resource(beacon, file_path, index):
             
     return beacon
 
+def getIndex(beacon, file_path, index):
+    with open(file_path, 'r', encoding='utf-8') as f:
+        json_data = json.load(f)
     
+    entries = json_data.get("entry", [])
+    for i, entry in enumerate(entries):
+        
+        resource_json = entry.get("resource")
+        if not resource_json:
+            continue
+
+        resource_type = resource_json.get("resourceType")
+        if resource_type == "Patient":
+            if "individuals" in beacon:
+                lsIndividuals = beacon["individuals"]
+                for idx, indv in enumerate(lsIndividuals):
+                    if indv["id"] == resource_json["id"]:
+                        index = idx
+                        break
+    
+    return index

@@ -34,7 +34,9 @@ with open(pathHeader, "r", encoding="utf-8") as f:
     beacon = json.load(f) 
 
 for idx, filesTobeacon in enumerate(valid_files):
-    beacon = FHIRProcess.process_fhir_resource(beacon, filesTobeacon, idx)
+    newIdx = FHIRProcess.getIndex(beacon, filesTobeacon, idx)
+
+    beacon = FHIRProcess.process_fhir_resource(beacon, filesTobeacon, newIdx)
     pathResult = os.path.join(os.getcwd(), 'Result')
     os.makedirs(pathResult, exist_ok=True)
 
