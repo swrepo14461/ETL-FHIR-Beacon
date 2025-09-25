@@ -59,37 +59,31 @@ def mapFhirToBeacon(row, target, fhirObjDict, df):
                         break
                 elif "COMBINENEXT" in toDo:
                     firstCommand = toDo
-                    rowNum = None
-                    if '|' in toDo:
-                        firstCommand = toDo.split('|')[0]
-                        arrToFind = toDo.split('|')[1].split('-')
-                        if arrToFind[0] == "GET":
-                            try:
-                                rowNum = int(arrToFind[1])
-                            except ValueError:
-                                rowNum = None
-
                     totalRowToCombined = firstCommand.split('-')[1]
                     for i in range(1, int(totalRowToCombined) + 1):
                         nextRow = df.iloc[df.index.get_loc(row.name) + i]
                         nextValue = getFhirValue(fhirObjDict, nextRow)
-                        if rowNum == None or i < rowNum:
+                        currToDo = nextRow["What to Do"]
+                        if '|' in currToDo:
+                            firstCommand = currToDo.split('|')[0]
+                            arrToFind = currToDo.split('|')[1].split('-')
+                            if arrToFind[0] == "GET":
+                                if (nextValue is not None):
+                                    valFind = [
+                                        coding
+                                        for obj in nextValue if arrToFind[1] in obj
+                                        for coding in obj[arrToFind[1]][arrToFind[2]]
+                                    ]
+                                    valueToInput.append({
+                                        "row": nextRow,
+                                        "value": valFind
+                                    })
+                        else:
                             if (nextValue is not None):
                                 valueToInput.append({
                                     "row": nextRow,
                                     "value": nextValue
-                                })
-                        elif rowNum == i:
-                            if (nextValue is not None):
-                                valFind = [
-                                    coding
-                                    for obj in nextValue if arrToFind[2] in obj
-                                    for coding in obj[arrToFind[2]][arrToFind[3]]
-                                ]
-                                valueToInput.append({
-                                    "row": nextRow,
-                                    "value": valFind
-                                })
+                                })                        
 
                 elif "COMBINED" in toDo:
                     isValid = False
@@ -101,8 +95,9 @@ def mapFhirToBeacon(row, target, fhirObjDict, df):
                     "row": row,
                     "value": value
                 })
-
-            setBeaconArrayValue(target, valueToInput)
+            
+            if len(valueToInput) > 0:
+                setBeaconArrayValue(target, valueToInput)
 
     return target
         
