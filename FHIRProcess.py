@@ -28,17 +28,17 @@ def validate_fhir_resource(json_file):
         return False, file_path
 
     resource_class_map = {
-        "Patient": Patient,
-        "Condition": Condition,
-        "Observation": Observation,
-        "Encounter": Encounter,
-        "ServiceRequest": ServiceRequest,
-        "Specimen": Specimen,
-        "Immunization": Immunization,
-        "AllergyIntolerance": AllergyIntolerance,
-        "MedicationRequest": MedicationRequest,
-        "Medication": Medication,
-        "Procedure": Procedure,
+        # "Patient": Patient,
+        # "Condition": Condition,
+        # "Observation": Observation,
+        # "Encounter": Encounter,
+        # "ServiceRequest": ServiceRequest,
+        # "Specimen": Specimen,
+        # "Immunization": Immunization,
+        # "AllergyIntolerance": AllergyIntolerance,
+        # "MedicationRequest": MedicationRequest,
+        # "Medication": Medication,
+        # "Procedure": Procedure,
         "Bundle": Bundle,
         "Composition": Composition
     }
@@ -72,21 +72,12 @@ def process_fhir_resource(beacon, file_path, index):
             continue
 
         resource_type = resource_json.get("resourceType")
-        if resource_type == "Patient":
-            beacon = YamlToBeaconConverter.convertFhirToBeacon(beacon, resource_json, index, resource_type)
-        elif resource_type == "Procedure":
-            beacon = YamlToBeaconConverter.convertFhirToBeacon(beacon, resource_json, index, resource_type)
-        elif resource_type == "Condition":
-            beacon = YamlToBeaconConverter.convertFhirToBeacon(beacon, resource_json, index, resource_type)
-        elif resource_type == "Observation":
-            beacon = YamlToBeaconConverter.convertFhirToBeacon(beacon, resource_json, index, resource_type)
-        elif resource_type == "AllergyIntolerance":
-            beacon = YamlToBeaconConverter.convertFhirToBeacon(beacon, resource_json, index, resource_type)
-        elif resource_type == "Medication":
-            beacon = YamlToBeaconConverter.convertFhirToBeacon(beacon, resource_json, index, resource_type)
-        elif resource_type == "MedicationDispense":
-            beacon = YamlToBeaconConverter.convertFhirToBeacon(beacon, resource_json, index, resource_type)
-        elif resource_type == "FamilyMemberHistory":
+        allowed_types = [
+            "Patient", "Procedure", "Condition", "Observation",
+            "AllergyIntolerance", "MedicationRequest", "MedicationDispense", "FamilyMemberHistory"
+        ]
+
+        if resource_type in allowed_types:
             beacon = YamlToBeaconConverter.convertFhirToBeacon(beacon, resource_json, index, resource_type)
         else:
             invalid_count += 1
@@ -109,8 +100,26 @@ def getIndex(beacon, file_path, index):
             if "individuals" in beacon:
                 lsIndividuals = beacon["individuals"]
                 for idx, indv in enumerate(lsIndividuals):
-                    if indv["id"] == resource_json["id"]:
+                    indv_id = indv.get("id")
+                    if indv_id is not None and indv_id == resource_json["id"]:
                         index = idx
                         break
     
     return index
+
+def getDictionary(file_path):
+    with open(file_path, 'r', encoding='utf-8') as f:
+        json_data = json.load(f)
+    
+    dictResource = []
+    entries = json_data.get("entry", [])
+    for i, entry in enumerate(entries):
+        resource_json = entry.get("resource")
+        if not resource_json:
+            continue
+        
+        resource_type = resource_json.get("resourceType")
+        if resource_type == "Medication":
+            dictResource.append(resource_json)
+
+    return dictResource

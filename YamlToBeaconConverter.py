@@ -5,7 +5,7 @@ import json
 def convertFhirToBeacon(beacon, fhirJson, index, typeFhir):
     mapper_path = os.path.join(os.getcwd(), "Mapper.xlsx")
     df = pd.read_excel(mapper_path, sheet_name="Mapper")
-    df_filtered = df[df["Where to Find"] == typeFhir]
+    df_filtered = df[df["Where to Find"].str.contains(typeFhir, na=False)]
     print(f"Processing {typeFhir} at index {index} with {len(df_filtered)} mappings")
 
     groupsMapper = df_filtered.groupby("Where to Use")
@@ -47,11 +47,25 @@ def mapFhirToBeacon(row, target, fhirObjDict, df):
                     arrToFind = toDo.split('|')[1].split(',') # category-array, coding-array
                     valToFind = toDo.split('|')[2]
 
-                    resultValidate = False
-                    root_val = fhirObjDict.get(arrToFind[0].split('-')[0])
+                    if 'OR' in valToFind:
+                        arrValToFind = valToFind.split('OR')
+                    elif 'AND' in valToFind:
+                        arrValToFind = valToFind.split('AND')
+                    else:
+                        arrValToFind = [valToFind]
 
-                    if root_val is not None and validate_nested(root_val, arrToFind[1:], valToFind):
-                        resultValidate = True
+                    resultValidate = False
+                    for val in arrValToFind:
+                        root_val = fhirObjDict.get(arrToFind[0].split('-')[0])
+                        
+                        if root_val is not None and validate_nested(root_val, arrToFind[1:], val):
+                            resultValidate = True
+                            if 'OR' in valToFind:
+                                break
+                        else:
+                            if 'AND' in valToFind:
+                                resultValidate = False
+                                break
 
                     if not resultValidate:
                         print("Data Not Valid")
@@ -78,6 +92,9 @@ def mapFhirToBeacon(row, target, fhirObjDict, df):
                                         "row": nextRow,
                                         "value": valFind
                                     })
+                            elif arrToFind[0] == "GETREF":
+                                if nextValue is not None:
+                                    aa = ""
                         else:
                             if (nextValue is not None):
                                 valueToInput.append({
