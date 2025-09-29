@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import json
 
-def convertFhirToBeacon(beacon, fhirJson, index, typeFhir):
+def convertFhirToBeacon(beacon, fhirJson, index, typeFhir, dict = []):
     mapper_path = os.path.join(os.getcwd(), "Mapper.xlsx")
     df = pd.read_excel(mapper_path, sheet_name="Mapper")
     df_filtered = df[df["Where to Find"].str.contains(typeFhir, na=False)]
@@ -20,7 +20,7 @@ def convertFhirToBeacon(beacon, fhirJson, index, typeFhir):
             target = beacon[key][index]
 
         for _, row in group.iterrows():            
-            target = mapFhirToBeacon(row, target, fhirJson, df_filtered)
+            target = mapFhirToBeacon(row, target, fhirJson, df_filtered, dict)
 
         if key in beacon and len(beacon[key]) > index and beacon[key][index] is not None:
             beacon[key][index] = target
@@ -30,7 +30,7 @@ def convertFhirToBeacon(beacon, fhirJson, index, typeFhir):
     return beacon
 
 #Beacon
-def mapFhirToBeacon(row, target, fhirObjDict, df):
+def mapFhirToBeacon(row, target, fhirObjDict, df, dict = []):
     # get instruction and set value
     whatToDoFind = row["What to Do"]
     if pd.isna(whatToDoFind):
@@ -73,7 +73,12 @@ def mapFhirToBeacon(row, target, fhirObjDict, df):
                         break
                 elif "COMBINENEXT" in toDo:
                     firstCommand = toDo
-                    totalRowToCombined = firstCommand.split('-')[1]
+                    arrCommand = firstCommand.split('-')
+                    if len(arrCommand) > 2:
+                        if arrCommand[2] != fhirObjDict["resourceType"]:
+                            continue
+
+                    totalRowToCombined = arrCommand[1]
                     for i in range(1, int(totalRowToCombined) + 1):
                         nextRow = df.iloc[df.index.get_loc(row.name) + i]
                         nextValue = getFhirValue(fhirObjDict, nextRow)
@@ -94,7 +99,18 @@ def mapFhirToBeacon(row, target, fhirObjDict, df):
                                     })
                             elif arrToFind[0] == "GETREF":
                                 if nextValue is not None:
-                                    aa = ""
+                                    arrNextVal = nextValue.split('/')
+                                    for dictData in dict:
+                                        if dictData['resourceType'] == arrNextVal[0] and dictData['id'] == arrNextVal[1]:
+                                            valFind = [
+                                                coding
+                                                for obj in dictData if arrToFind[1] in obj
+                                                for coding in obj[arrToFind[1]][arrToFind[2]]
+                                            ]
+                                            valueToInput.append({
+                                                "row": nextRow,
+                                                "value": valFind
+                                            })
                         else:
                             if (nextValue is not None):
                                 valueToInput.append({

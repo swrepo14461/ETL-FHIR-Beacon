@@ -61,6 +61,8 @@ def validate_fhir_resource(json_file):
     return result
 
 def process_fhir_resource(beacon, file_path, index):
+    dict = getDictionary(file_path)
+
     with open(file_path, 'r', encoding='utf-8') as f:
         json_data = json.load(f)
 
@@ -78,7 +80,7 @@ def process_fhir_resource(beacon, file_path, index):
         ]
 
         if resource_type in allowed_types:
-            beacon = YamlToBeaconConverter.convertFhirToBeacon(beacon, resource_json, index, resource_type)
+            beacon = YamlToBeaconConverter.convertFhirToBeacon(beacon, resource_json, index, resource_type, dict)
         else:
             invalid_count += 1
             
