@@ -1,0 +1,1383 @@
+{
+    "dataset": {
+        "createDateTime": "2021-03-21T02:37:00-08:00",
+        "dataUseConditions": {
+            "duoDataUse": [
+                {
+                    "id": "DUO:0000042",
+                    "label": "general research use",
+                    "version": "17-07-2016"
+                }
+            ]
+        },
+        "description": "Simulation set 1.",
+        "externalUrl": "http://example.org/wiki/Main_Page",
+        "id": "UNQ_1",
+        "info": {},
+        "name": "Dataset with fake data",
+        "updateDateTime": "2022-08-05T17:21:00+01:00",
+        "version": "v1.1"
+    },
+    "individual": [
+        {
+            "diseases": [
+                {
+                    "id": "e3d8b113-f161-4cb2-aa72-fb189ac0dbd0",
+                    "notes": "Keluhan utama: nyeri pinggang kanan"
+                },
+                {
+                    "id": "93120878-e240-4dc1-8e56-e79da2faf872",
+                    "notes": "Riwayat obstruksi saluran kemih"
+                },
+                {
+                    "diseaseCode": {
+                        "id": "ICD10:N18.4",
+                        "label": "Chronic kidney disease, stage 4 (severe)"
+                    },
+                    "id": "a0ae133c-9469-4107-a5b2-1311a122ece1"
+                },
+                {
+                    "diseaseCode": {
+                        "id": "ICD10:N20.0",
+                        "label": "Calculus of kidney"
+                    },
+                    "id": "ced21ea3-f8a6-4b30-8d13-2586c4984315"
+                },
+                {
+                    "diseaseCode": {
+                        "id": "ICD10:I10",
+                        "label": "Essential (primary) hypertension"
+                    },
+                    "id": "2578abce-04d1-484a-9a67-73dbbfc79cac"
+                }
+            ],
+            "id": "P00805884304",
+            "measurements": [
+                {
+                    "assayCode": {
+                        "id": "SNOMED:38341003",
+                        "label": "Hypertension"
+                    },
+                    "date": "2024-04-24T03:20:00+00:00",
+                    "id": "bc54a402-6c42-40e6-8f62-924e01e136f4",
+                    "measurementValue": true
+                },
+                {
+                    "assayCode": {
+                        "id": "SNOMED:73211009",
+                        "label": "Diabetes mellitus"
+                    },
+                    "date": "2024-04-24T03:20:00+00:00",
+                    "id": "143b575b-43ff-439b-b1fa-46ff63f5128e",
+                    "measurementValue": false
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8462-4",
+                        "label": "Diastolic blood pressure"
+                    },
+                    "date": "2024-04-24T03:25:00+00:00",
+                    "id": "a520c046-b667-4c85-8311-482a0aa83095",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:mm[Hg]",
+                            "label": "mm[Hg]"
+                        },
+                        "value": 85
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8480-6",
+                        "label": "Systolic blood pressure"
+                    },
+                    "date": "2024-04-24T03:25:00+00:00",
+                    "id": "4a23d269-bb9d-4854-a1b8-5ecabcb70453",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:mm[Hg]",
+                            "label": "mm[Hg]"
+                        },
+                        "value": 140
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:29463-7",
+                        "label": "Body weight"
+                    },
+                    "date": "2024-04-24T03:25:00+00:00",
+                    "id": "08cdd90b-a1d7-4102-90c2-ac189a5db086",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:kg",
+                            "label": "kg"
+                        },
+                        "value": 70
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8302-2",
+                        "label": "Body height"
+                    },
+                    "date": "2024-04-24T03:25:00+00:00",
+                    "id": "f7dfe435-01c9-47a2-b59d-cc948526bac0",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:cm",
+                            "label": "cm"
+                        },
+                        "value": 168
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:2160-0",
+                        "label": "Creatinine [Mass/volume] in Serum or Plasma"
+                    },
+                    "date": "2024-04-24T03:40:00+00:00",
+                    "id": "d684f189-16f0-45e8-90f4-bd908aee4c62",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:mg/dL",
+                            "label": "mg/dL"
+                        },
+                        "value": 2.6
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:33914-3",
+                        "label": "Glomerular filtration rate/1.73 sq M.predicted [Volume Rate/Area]"
+                    },
+                    "date": "2024-04-24T03:40:00+00:00",
+                    "id": "20ac794a-d4b1-4471-bc78-53b23f398436",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:mL/min/1.73m2",
+                            "label": "mL/min/1.73m2"
+                        },
+                        "value": 25
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:30764-1",
+                        "label": "Kidney right US"
+                    },
+                    "date": "2024-04-24T03:50:00+00:00",
+                    "id": "44c7cc68-07c6-4e46-9c9d-1441bf032692",
+                    "notes": "Batu 6 mm pada calyx medius ginjal kanan"
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:30765-8",
+                        "label": "Kidney left US"
+                    },
+                    "date": "2024-04-24T03:50:00+00:00",
+                    "id": "d66dd8fd-117a-45a0-a66c-497ed6ad0664",
+                    "notes": "Tidak tampak batu, ukuran ginjal dalam batas"
+                }
+            ]
+        },
+        {
+            "diseases": [
+                {
+                    "diseaseCode": {
+                        "id": "SNOMED:38670004",
+                        "label": "Vaginal bleeding"
+                    },
+                    "id": "cond-keluhan-utama-001"
+                },
+                {
+                    "diseaseCode": {
+                        "id": "SNOMED:21522001",
+                        "label": "Lower abdominal pain"
+                    },
+                    "id": "cond-keluhan-penyerta-001"
+                },
+                {
+                    "diseaseCode": {
+                        "id": "SNOMED:44054006",
+                        "label": "Diabetes mellitus type 2"
+                    },
+                    "id": "cond-riwayat-terdahulu-001"
+                },
+                {
+                    "diseaseCode": {
+                        "id": "SNOMED:77386006",
+                        "label": "Pregnant"
+                    },
+                    "id": "cond-riwayat-sekarang-001"
+                },
+                {
+                    "diseaseCode": {
+                        "id": "SNOMED:44054006",
+                        "label": "Diabetes mellitus type 2"
+                    },
+                    "id": "fmh-001"
+                },
+                {
+                    "diseaseCode": {
+                        "id": "ICD10:O20.9",
+                        "label": "Hemorrhage in early pregnancy, unspecified"
+                    },
+                    "id": "cond-dx-awal-001"
+                },
+                {
+                    "diseaseCode": {
+                        "id": "SNOMED:19112008",
+                        "label": "Threatened abortion"
+                    },
+                    "id": "cond-dx-kerja-001"
+                }
+            ],
+            "id": "P03647103112",
+            "interventionsOrProcedures": [
+                {
+                    "dateOfProcedure": "2023-06-04T10:12:00+00:00",
+                    "id": "proc-lab-001",
+                    "procedureCode": {
+                        "id": "SNOMED:22778000",
+                        "label": "Venipuncture for blood test"
+                    }
+                },
+                {
+                    "dateOfProcedure": "2023-06-04T10:16:00+00:00",
+                    "id": "proc-prarad-001",
+                    "procedureCode": {
+                        "id": "SNOMED:387713003",
+                        "label": "Insertion of intravenous cannula"
+                    }
+                },
+                {
+                    "dateOfProcedure": "2023-06-04T10:25:00+00:00",
+                    "id": "proc-ekg-001",
+                    "procedureCode": {
+                        "id": "SNOMED:185349003",
+                        "label": "Electrocardiographic procedure"
+                    }
+                }
+            ],
+            "measurements": [
+                {
+                    "assayCode": {
+                        "id": "LOINC:89251-7",
+                        "label": "Emergency department triage acuity"
+                    },
+                    "date": "2023-06-04T09:50:00+00:00",
+                    "id": "obs-triase-001"
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:72514-3",
+                        "label": "Pain severity - 0-10 verbal numeric rating [Score] - Reported"
+                    },
+                    "date": "2023-06-04T09:52:00+00:00",
+                    "id": "obs-nyeri-001",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:{score}",
+                            "label": "{score}"
+                        },
+                        "value": 6
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:89262-4",
+                        "label": "Morse fall risk score"
+                    },
+                    "date": "2023-06-04T09:53:00+00:00",
+                    "id": "obs-morse-001",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:{score}",
+                            "label": "{score}"
+                        },
+                        "value": 15
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:62237-6",
+                        "label": "Braden scale total score"
+                    },
+                    "date": "2023-06-04T09:55:00+00:00",
+                    "id": "obs-decubitus-001",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:{score}",
+                            "label": "{score}"
+                        },
+                        "value": 19
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "SNOMED:422400008",
+                        "label": "Vomiting (finding)"
+                    },
+                    "date": "2023-06-04T09:58:00+00:00",
+                    "id": "obs-muntah-001"
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8480-6",
+                        "label": "Systolic blood pressure"
+                    },
+                    "date": "2023-06-04T10:05:00+00:00",
+                    "id": "obs-sistole-001",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:mm[Hg]",
+                            "label": "mm[Hg]"
+                        },
+                        "value": 120
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8462-4",
+                        "label": "Diastolic blood pressure"
+                    },
+                    "date": "2023-06-04T10:05:00+00:00",
+                    "id": "obs-diastole-001",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:mm[Hg]",
+                            "label": "mm[Hg]"
+                        },
+                        "value": 78
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8310-5",
+                        "label": "Body temperature"
+                    },
+                    "date": "2023-06-04T10:05:00+00:00",
+                    "id": "obs-suhu-001",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:Cel",
+                            "label": "Cel"
+                        },
+                        "value": 36.9
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8867-4",
+                        "label": "Heart rate"
+                    },
+                    "date": "2023-06-04T10:05:00+00:00",
+                    "id": "obs-nadi-001",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:/min",
+                            "label": "/min"
+                        },
+                        "value": 92
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:9279-1",
+                        "label": "Respiratory rate"
+                    },
+                    "date": "2023-06-04T10:05:00+00:00",
+                    "id": "obs-pernapasan-001",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:/min",
+                            "label": "/min"
+                        },
+                        "value": 18
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:9269-2",
+                        "label": "Glasgow coma score total"
+                    },
+                    "date": "2023-06-04T10:06:00+00:00",
+                    "id": "obs-gcs-001",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:{score}",
+                            "label": "{score}"
+                        },
+                        "value": 15
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:29463-7",
+                        "label": "Body weight"
+                    },
+                    "date": "2023-06-04T10:06:00+00:00",
+                    "id": "obs-berat-001",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:kg",
+                            "label": "kg"
+                        },
+                        "value": 62
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8302-2",
+                        "label": "Body height"
+                    },
+                    "date": "2023-06-04T10:06:00+00:00",
+                    "id": "obs-tinggi-001",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:cm",
+                            "label": "cm"
+                        },
+                        "value": 162
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8277-6",
+                        "label": "Body surface area"
+                    },
+                    "date": "2023-06-04T10:06:00+00:00",
+                    "id": "obs-bsa-001",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:m2",
+                            "label": "m2"
+                        },
+                        "value": 1.67
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:32451-7",
+                        "label": "Eye physical exam Narrative"
+                    },
+                    "date": "2023-06-04T10:07:00+00:00",
+                    "id": "obs-mata-001",
+                    "notes": "Konjungtiva anemis ringan, sklera ikterik (-)."
+                },
+                {
+                    "assayCode": {
+                        "id": "SNOMED:106048009",
+                        "label": "Mental state"
+                    },
+                    "date": "2023-06-04T10:08:00+00:00",
+                    "id": "obs-psikologis-001",
+                    "notes": "Cemas ringan, kooperatif."
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:718-7",
+                        "label": "Hemoglobin [Mass/volume] in Blood"
+                    },
+                    "date": "2023-06-04T10:35:00+00:00",
+                    "id": "obs-lab-hb-001",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:g/dL",
+                            "label": "g/dL"
+                        },
+                        "value": 10.2
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:6690-2",
+                        "label": "Leukocytes [#/volume] in Blood by Automated count"
+                    },
+                    "date": "2023-06-04T10:35:00+00:00",
+                    "id": "obs-lab-wbc-001",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:10*3/uL",
+                            "label": "10*3/uL"
+                        },
+                        "value": 8.9
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:21112-8",
+                        "label": "Pregnancy test [Presence] in Urine"
+                    },
+                    "date": "2023-06-04T10:18:00+00:00",
+                    "id": "obs-prarad-001"
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:59776-5",
+                        "label": "US Pelvis Narrative"
+                    },
+                    "date": "2023-06-04T10:50:00+00:00",
+                    "id": "obs-rad-001",
+                    "notes": "USG pelvis: uterus normal, tidak tampak kantung gestasi, tidak tampak massa adneksa, cairan bebas (-)."
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:11524-6",
+                        "label": "ECG Impression"
+                    },
+                    "date": "2023-06-04T10:26:00+00:00",
+                    "id": "obs-ekg-001",
+                    "notes": "Irama sinus, tidak ada elevasi ST."
+                },
+                {
+                    "date": "2023-06-04T12:00:00+00:00",
+                    "id": "obs-pemulangan-001",
+                    "notes": "Istirahat, hindari aktivitas berat, kontrol 3 hari atau segera bila perdarahan bertambah."
+                }
+            ],
+            "phenotypicFeatures": [
+                {
+                    "featureType": {
+                        "id": "SNOMED:414285001",
+                        "label": "Allergy to substance (disorder)"
+                    },
+                    "id": "allergy-lingkungan-001",
+                    "modifiers": [
+                        {
+                            "id": "SNOMED:419199007",
+                            "label": "Allergy to house dust mite"
+                        }
+                    ]
+                },
+                {
+                    "featureType": {
+                        "id": "SNOMED:416098002",
+                        "label": "Drug allergy (disorder)"
+                    },
+                    "id": "allergy-prarad-001",
+                    "modifiers": [
+                        {
+                            "id": "SNOMED:294505008",
+                            "label": "Allergy to diagnostic agent"
+                        }
+                    ],
+                    "notes": "Allergy to iodine-based contrast"
+                }
+            ],
+            "sex": {
+                "id": "NCIT:C16576",
+                "label": "female"
+            },
+            "treatments": [
+                {
+                    "treatmentCode": {
+                        "id": "KFA:93001001",
+                        "label": "Tranexamic acid 500 mg injection"
+                    }
+                },
+                {
+                    "treatmentCode": {
+                        "id": "KFA:93000666",
+                        "label": "Paracetamol 500 mg tablet"
+                    }
+                }
+            ]
+        },
+        {
+            "diseases": [
+                {
+                    "diseaseCode": {
+                        "id": "SNOMED:359746009",
+                        "label": "Patient's condition stable"
+                    },
+                    "id": "240a0374-8690-43cb-927d-08d5a063e394"
+                },
+                {
+                    "diseaseCode": {
+                        "id": "SNOMED:80313002",
+                        "label": "Palpitations"
+                    },
+                    "id": "1a08a280-b968-46e9-bf48-beae115c9ad4"
+                },
+                {
+                    "diseaseCode": {
+                        "id": "SNOMED:194828000",
+                        "label": "Angina pectoris"
+                    },
+                    "id": "3b82b38f-20a9-4253-a7a7-0673fe71d56a"
+                },
+                {
+                    "diseaseCode": {
+                        "id": "SNOMED:161527007",
+                        "label": "H/O: asthma"
+                    },
+                    "id": "a3e52e62-10b9-4d54-8b2b-fd6585737972"
+                }
+            ],
+            "interventionsOrProcedures": [
+                {
+                    "id": "a5c0a8b2-e32e-43e5-bdaf-ac34de8f11dc",
+                    "procedureCode": {
+                        "id": "ICD9CM:89.52",
+                        "label": "Electrocardiogram"
+                    }
+                }
+            ],
+            "measurements": [
+                {
+                    "assayCode": {
+                        "id": "LOINC:34534-8",
+                        "label": "12 lead EKG panel"
+                    },
+                    "date": "2024-03-14T02:50:00+00:00",
+                    "id": "8af8ae78-5526-4654-89ff-ec9dfcd24041",
+                    "notes": "Hasil pemeriksaan EKG menunjukkan adanya gangguan pada jantung"
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8480-6",
+                        "label": "Systolic blood pressure"
+                    },
+                    "date": "2024-03-14T02:24:00+00:00",
+                    "id": "7832ec54-9064-44f2-8719-d1cb531c849f",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:mm[Hg]",
+                            "label": "mm[Hg]"
+                        },
+                        "value": 182
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8462-4",
+                        "label": "Diastolic blood pressure"
+                    },
+                    "date": "2024-03-14T02:24:00+00:00",
+                    "id": "707b2bf0-3971-4497-93fa-00e89381fbe5",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:mm[Hg]",
+                            "label": "mm[Hg]"
+                        },
+                        "value": 115
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8310-5",
+                        "label": "Body temperature"
+                    },
+                    "date": "2024-03-14T02:25:00+00:00",
+                    "id": "0e70d87b-8e78-4cc0-99bf-48cc8caa01f4",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:Cel",
+                            "label": "Cel"
+                        },
+                        "value": 37.5
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8867-4",
+                        "label": "Heart rate"
+                    },
+                    "date": "2024-03-14T02:22:00+00:00",
+                    "id": "231f1eb5-f9a5-4cbe-bb58-6295f990b0f9",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:/min",
+                            "label": "/min"
+                        },
+                        "value": 80
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:29463-7",
+                        "label": "Body weight"
+                    },
+                    "date": "2024-03-14T02:26:00+00:00",
+                    "id": "1bdc8c93-e2d7-4e58-ba04-b0b8e32adb7c",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:kg",
+                            "label": "kg"
+                        },
+                        "value": 75
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8302-2",
+                        "label": "Body height"
+                    },
+                    "date": "2024-03-14T02:27:00+00:00",
+                    "id": "dc774b86-a49f-49f0-a55f-125f5c603ede",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:cm",
+                            "label": "cm"
+                        },
+                        "value": 160
+                    }
+                }
+            ],
+            "phenotypicFeatures": [
+                {
+                    "modifiers": [
+                        {
+                            "id": "SNOMED:426783006",
+                            "label": "Electrocardiogram: sinus rhythm"
+                        },
+                        {
+                            "id": "SNOMED:164889003",
+                            "label": "Electrocardiographic atrial fibrillation"
+                        },
+                        {
+                            "id": "SNOMED:76388001",
+                            "label": "ST segment elevation"
+                        },
+                        {
+                            "id": "SNOMED:26141007",
+                            "label": "ST segment depression"
+                        },
+                        {
+                            "id": "SNOMED:59931005",
+                            "label": "Inverted T wave"
+                        }
+                    ]
+                },
+                {
+                    "featureType": {
+                        "id": "SNOMED:426232007",
+                        "label": "Allergy to food (disorder)"
+                    },
+                    "id": "d4e02558-ef08-4698-bf38-ba048d1251ac",
+                    "modifiers": [
+                        {
+                            "id": "SNOMED:91930004",
+                            "label": "Allergy to eggs"
+                        }
+                    ],
+                    "notes": "Alergi Telur"
+                }
+            ],
+            "treatments": [
+                {
+                    "treatmentCode": {
+                        "id": "KFA:93002126",
+                        "label": "Amlodipine Besilate 5 mg Tablet (DEXA MEDICA)"
+                    }
+                }
+            ]
+        },
+        {
+            "diseases": [
+                {
+                    "diseaseCode": {
+                        "id": "SNOMED:372288004",
+                        "label": "Local tumor invasion"
+                    },
+                    "id": "516c2d54-68f9-4ff5-bd03-362d55edeacf"
+                },
+                {
+                    "diseaseCode": {
+                        "id": "KEMKES:C50.2",
+                        "label": "Upper-inner quadrant of breast"
+                    },
+                    "id": "0e38be39-1425-4d4e-aab4-e8c9b265c476"
+                },
+                {
+                    "diseaseCode": {
+                        "id": "ICD10:C50.2",
+                        "label": "Malignant neoplasm: Upper-inner quadrant of breast"
+                    },
+                    "id": "2bbedc42-87e5-4ea6-bc6d-5691b3c313dd"
+                },
+                {
+                    "diseaseCode": {
+                        "id": "SNOMED:80313002",
+                        "label": "Palpitations"
+                    },
+                    "id": "1a08a280-b968-46e9-bf48-beae115c9ad4"
+                },
+                {
+                    "diseaseCode": {
+                        "id": "KEMKES:T2",
+                        "label": "T2"
+                    },
+                    "id": "d1b4e95f-40a0-4574-bb48-3584a3df7ca1"
+                }
+            ],
+            "interventionsOrProcedures": [
+                {
+                    "id": "d562f978-b4b6-4f8b-a7f6-3b3bfad46d09",
+                    "procedureCode": {
+                        "id": "SNOMED:128303001",
+                        "label": "Surgical removal"
+                    }
+                },
+                {
+                    "id": "b69ce47e-8c47-445e-85e5-fd915f8e52f1",
+                    "procedureCode": {
+                        "id": "ICD9CM:85.41",
+                        "label": "Unilateral simple mastectomy"
+                    }
+                }
+            ],
+            "measurements": [
+                {
+                    "assayCode": {
+                        "id": "LOINC:42132-1",
+                        "label": "US Breast screening"
+                    },
+                    "date": "2023-11-06T09:45:00+00:00",
+                    "id": "ee77055c-2f43-4a94-b2f3-03f99463a2bb",
+                    "notes": "Lesi solid sugestif maligna di regio perisikatriks superior payudara kanan. "
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8867-4",
+                        "label": "Heart rate"
+                    },
+                    "date": "2024-03-14T02:22:00+00:00",
+                    "id": "231f1eb5-f9a5-4cbe-bb58-6295f990b0f9",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:/min",
+                            "label": "/min"
+                        },
+                        "value": 80
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:30651-4",
+                        "label": "US Guidance for percutaneous biopsy.core needle of Breast"
+                    },
+                    "date": "2023-11-13T07:30:00+00:00",
+                    "id": "07358343-5598-4a8f-91ed-7fee9fd99fc8",
+                    "notes": "Invasive lobular carcinoma grade 2 pada payudara kanan. skor tubular 3, skor inti 3, skor mitosis 1, total skor =7 -invasi limfovaskuler tidak ditemukan -batas-batas sayatan jam 3, 6, 7, 9, 12 dan retroareola semuanya bebas tumor"
+                }
+            ],
+            "treatments": [
+                {
+                    "treatmentCode": {
+                        "id": "KFA:93005226",
+                        "label": "Anastrozole 1 mg Tablet Salut Selaput (ARIMIDEX)"
+                    }
+                }
+            ]
+        },
+        {
+            "diseases": [
+                {
+                    "diseaseCode": {
+                        "id": "SNOMED:80313002",
+                        "label": "Palpitations"
+                    },
+                    "id": "1a08a280-b968-46e9-bf48-beae115c9ad4"
+                },
+                {
+                    "diseaseCode": {
+                        "id": "SNOMED:194828000",
+                        "label": "Angina pectoris"
+                    },
+                    "id": "3b82b38f-20a9-4253-a7a7-0673fe71d56a"
+                },
+                {
+                    "diseaseCode": {
+                        "id": "SNOMED:161527007",
+                        "label": "H/O: asthma"
+                    },
+                    "id": "a3e52e62-10b9-4d54-8b2b-fd6585737972"
+                },
+                {
+                    "diseaseCode": {
+                        "id": "SNOMED:359746009",
+                        "label": "Patient's condition stable"
+                    },
+                    "id": "240a0374-8690-43cb-927d-08d5a063e394"
+                }
+            ],
+            "interventionsOrProcedures": [
+                {
+                    "id": "a5c0a8b2-e32e-43e5-bdaf-ac34de8f11dc",
+                    "procedureCode": {
+                        "id": "ICD9CM:89.52",
+                        "label": "Electrocardiogram"
+                    }
+                }
+            ],
+            "measurements": [
+                {
+                    "assayCode": {
+                        "id": "LOINC:8480-6",
+                        "label": "Systolic blood pressure"
+                    },
+                    "date": "2024-03-14T02:24:00+00:00",
+                    "id": "7832ec54-9064-44f2-8719-d1cb531c849f",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:mm[Hg]",
+                            "label": "mm[Hg]"
+                        },
+                        "value": 182
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8462-4",
+                        "label": "Diastolic blood pressure"
+                    },
+                    "date": "2024-03-14T02:24:00+00:00",
+                    "id": "707b2bf0-3971-4497-93fa-00e89381fbe5",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:mm[Hg]",
+                            "label": "mm[Hg]"
+                        },
+                        "value": 115
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8310-5",
+                        "label": "Body temperature"
+                    },
+                    "date": "2024-03-14T02:25:00+00:00",
+                    "id": "0e70d87b-8e78-4cc0-99bf-48cc8caa01f4",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:Cel",
+                            "label": "Cel"
+                        },
+                        "value": 37.5
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8867-4",
+                        "label": "Heart rate"
+                    },
+                    "date": "2024-03-14T02:22:00+00:00",
+                    "id": "231f1eb5-f9a5-4cbe-bb58-6295f990b0f9",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:/min",
+                            "label": "/min"
+                        },
+                        "value": 80
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:29463-7",
+                        "label": "Body weight"
+                    },
+                    "date": "2024-03-14T02:26:00+00:00",
+                    "id": "1bdc8c93-e2d7-4e58-ba04-b0b8e32adb7c",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:kg",
+                            "label": "kg"
+                        },
+                        "value": 75
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8302-2",
+                        "label": "Body height"
+                    },
+                    "date": "2024-03-14T02:27:00+00:00",
+                    "id": "dc774b86-a49f-49f0-a55f-125f5c603ede",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:cm",
+                            "label": "cm"
+                        },
+                        "value": 160
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:34534-8",
+                        "label": "12 lead EKG panel"
+                    },
+                    "date": "2024-03-14T02:50:00+00:00",
+                    "id": "8af8ae78-5526-4654-89ff-ec9dfcd24041",
+                    "notes": "Hasil pemeriksaan EKG menunjukkan adanya gangguan pada jantung"
+                }
+            ],
+            "phenotypicFeatures": [
+                {
+                    "featureType": {
+                        "id": "SNOMED:426232007",
+                        "label": "Allergy to food (disorder)"
+                    },
+                    "id": "d4e02558-ef08-4698-bf38-ba048d1251ac",
+                    "modifiers": [
+                        {
+                            "id": "SNOMED:91930004",
+                            "label": "Allergy to eggs"
+                        }
+                    ],
+                    "notes": "Alergi Telur"
+                },
+                {
+                    "modifiers": [
+                        {
+                            "id": "SNOMED:426783006",
+                            "label": "Electrocardiogram: sinus rhythm"
+                        },
+                        {
+                            "id": "SNOMED:164889003",
+                            "label": "Electrocardiographic atrial fibrillation"
+                        },
+                        {
+                            "id": "SNOMED:76388001",
+                            "label": "ST segment elevation"
+                        },
+                        {
+                            "id": "SNOMED:26141007",
+                            "label": "ST segment depression"
+                        },
+                        {
+                            "id": "SNOMED:59931005",
+                            "label": "Inverted T wave"
+                        }
+                    ]
+                }
+            ],
+            "treatments": [
+                {
+                    "treatmentCode": {
+                        "id": "KFA:93002126",
+                        "label": "Amlodipine Besilate 5 mg Tablet (DEXA MEDICA)"
+                    }
+                }
+            ]
+        },
+        {
+            "diseases": [
+                {
+                    "diseaseCode": {
+                        "id": "ICD10:I63.5",
+                        "label": "Cerebral infarction due unspecified occlusion or stenos cerebrl arteries"
+                    },
+                    "id": "33fc192f-20c2-4530-a113-7b5bc6d7f4a5"
+                }
+            ],
+            "interventionsOrProcedures": [
+                {
+                    "id": "3baf3836-1e71-4a74-8e51-b6505a26d0f0",
+                    "procedureCode": {
+                        "id": "ICD9CM:99.10",
+                        "label": "Injection or infusion of thrombolytic agent"
+                    }
+                },
+                {
+                    "id": "75f5fe11-8514-442a-a23b-b50001e8ceef",
+                    "procedureCode": {
+                        "id": "ICD9CM:39.74",
+                        "label": "Endovascular removal of obstruction from head and neck vessel (s)"
+                    }
+                }
+            ],
+            "measurements": [
+                {
+                    "assayCode": {
+                        "id": "LOINC:75859-9",
+                        "label": "Modified rankin scale"
+                    },
+                    "date": "2023-03-01T02:10:00+00:00",
+                    "id": "f787ff5e-0579-4811-a0bc-76708a5d891b"
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8302-2",
+                        "label": "Body height"
+                    },
+                    "date": "2023-03-01T02:15:00+00:00",
+                    "id": "5c23385f-ddd3-44cc-809c-a7efcdbadee5",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:cm",
+                            "label": "cm"
+                        },
+                        "value": 165
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "SNOMED:405137009",
+                        "label": "Risk control behavior: alcohol use"
+                    },
+                    "date": "2023-03-01T02:10:00+00:00",
+                    "id": "fbea1cfa-af02-4a43-b62d-c0b89d3db1c8",
+                    "measurementValue": false
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8462-4",
+                        "label": "Diastolic blood pressure"
+                    },
+                    "date": "2023-03-01T02:15:00+00:00",
+                    "id": "8118ae1e-261f-4339-addb-94af45447b3b",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:mm[Hg]",
+                            "label": "mm[Hg]"
+                        },
+                        "value": 90
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "SNOMED:73211009",
+                        "label": "Diabetes mellitus"
+                    },
+                    "date": "2023-03-01T02:10:00+00:00",
+                    "id": "74045b96-a6b1-4857-864a-8a0857b22700",
+                    "measurementValue": true
+                },
+                {
+                    "assayCode": {
+                        "id": "SNOMED:431765005",
+                        "label": "Screening for dysphagia"
+                    },
+                    "date": "2023-03-01T02:15:00+00:00",
+                    "id": "07892d33-046f-4951-aaf1-9434c1b379ca"
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:36146-9",
+                        "label": "CTA Carotid artery W contrast IV"
+                    },
+                    "date": "2023-03-02T02:30:00+00:00",
+                    "id": "3144e054-7de1-44b4-8ea7-3a80f1f82e8f"
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:42132-1",
+                        "label": "CT Head W contrast IV"
+                    },
+                    "date": "2023-11-06T09:45:00+00:00",
+                    "id": "980a3b8c-d4ea-48e5-a3a0-2bb0f82f924d"
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:72089-6",
+                        "label": "Total score [NIH Stroke Scale]"
+                    },
+                    "date": "2023-03-01T02:15:00+00:00",
+                    "id": "83666622-7f81-4336-96db-f0d4c72bc11c",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:{score}",
+                            "label": "{score}"
+                        },
+                        "value": 14
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:75859-9",
+                        "label": "Modified rankin scale"
+                    },
+                    "date": "2023-03-01T02:15:00+00:00",
+                    "id": "d63d9b5d-aa98-4405-8c25-e4e8cc62a073"
+                },
+                {
+                    "assayCode": {
+                        "id": "SNOMED:38341003",
+                        "label": "Hypertension"
+                    },
+                    "date": "2023-03-01T02:10:00+00:00",
+                    "id": "1996e2b0-f47e-440d-bff5-e3db59fadf3d",
+                    "measurementValue": true
+                },
+                {
+                    "assayCode": {
+                        "id": "KEMKES:OC000186",
+                        "label": "Wake up stroke"
+                    },
+                    "date": "2023-03-01T02:10:00+00:00",
+                    "id": "bd7497e4-ece2-43c4-b333-1e4f4a76a8e0"
+                },
+                {
+                    "assayCode": {
+                        "id": "KEMKES:OC000170",
+                        "label": "Riwayat KB Hormonal"
+                    },
+                    "date": "2023-03-01T02:10:00+00:00",
+                    "id": "bcecea71-ebfe-45f6-b547-baa9cd61c960",
+                    "measurementValue": false
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:72166-2",
+                        "label": "Tobacco smoking status"
+                    },
+                    "date": "2023-03-01T02:10:00+00:00",
+                    "id": "61b4f70f-9003-470f-9695-707abba1314a"
+                },
+                {
+                    "assayCode": {
+                        "id": "KEMKES:OC000183",
+                        "label": "Thrombolysis in Cerebral Infarction Score"
+                    },
+                    "date": "2023-03-01T04:15:00+00:00",
+                    "id": "34d72695-6997-4593-bd6c-890373010f74"
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:75859-9",
+                        "label": "Modified rankin scale"
+                    },
+                    "date": "2023-03-05T05:00:00+00:00",
+                    "id": "f4b0369b-e33d-46f3-b0fa-28d6acb14b6a"
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:72089-6",
+                        "label": "Total score [NIH Stroke Scale]"
+                    },
+                    "date": "2023-03-05T05:00:00+00:00",
+                    "id": "5ee7af85-7f11-4ec3-82f9-aa8c3a4d03f6",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:{score}",
+                            "label": "{score}"
+                        },
+                        "value": 14
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:8480-6",
+                        "label": "Systolic blood pressure"
+                    },
+                    "date": "2023-03-01T02:15:00+00:00",
+                    "id": "df02e44c-61c1-4dea-a60b-5d3af04e78ab",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:mm[Hg]",
+                            "label": "mm[Hg]"
+                        },
+                        "value": 140
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:72089-6",
+                        "label": "Total score [NIH Stroke Scale]"
+                    },
+                    "date": "2023-03-01T03:00:00+00:00",
+                    "id": "9ad45971-33ba-41fb-aa1b-bebfa882cb71",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:{score}",
+                            "label": "{score}"
+                        },
+                        "value": 14
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "LOINC:29463-7",
+                        "label": "Body weight"
+                    },
+                    "date": "2023-03-01T02:15:00+00:00",
+                    "id": "ee3bc6ff-4ba7-4c24-a463-53811da3abe0",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:kg",
+                            "label": "kg"
+                        },
+                        "value": 75
+                    }
+                },
+                {
+                    "assayCode": {
+                        "id": "SNOMED:370992007",
+                        "label": "Dyslipidemia"
+                    },
+                    "date": "2023-03-01T02:10:00+00:00",
+                    "id": "230fbde5-49b7-4738-875e-b23e8472edd0",
+                    "measurementValue": true
+                },
+                {
+                    "assayCode": {
+                        "id": "KEMKES:OC000181",
+                        "label": "Alberta Stroke Program Early CT score"
+                    },
+                    "date": "2023-11-06T09:45:00+00:00",
+                    "id": "f22de1a0-6fc8-4e13-abc7-8e0d87ba6928",
+                    "measurementValue": {
+                        "unit": {
+                            "id": "UCUM:{score}",
+                            "label": "{score}"
+                        },
+                        "value": 4
+                    }
+                }
+            ],
+            "phenotypicFeatures": [
+                {
+                    "modifiers": [
+                        {
+                            "id": "SNOMED:715047008",
+                            "label": "Does obtain medication"
+                        },
+                        {
+                            "id": "SNOMED:31509003",
+                            "label": "Controlled"
+                        }
+                    ]
+                },
+                {
+                    "modifiers": [
+                        {
+                            "id": "SNOMED:268607006",
+                            "label": "Hypertension risk level"
+                        },
+                        {
+                            "id": "SNOMED:715047008",
+                            "label": "Does obtain medication"
+                        },
+                        {
+                            "id": "SNOMED:31509003",
+                            "label": "Controlled"
+                        }
+                    ],
+                    "severity": {
+                        "id": "SNOMED:827068008",
+                        "label": "Stage 2 hypertension"
+                    }
+                },
+                {
+                    "modifiers": [
+                        {
+                            "id": "SNOMED:715047008",
+                            "label": "Does obtain medication"
+                        },
+                        {
+                            "id": "KEMKES:OC000180",
+                            "label": "Intensitas Obat Statin"
+                        }
+                    ],
+                    "severity": {
+                        "id": "KEMKES:OV000409",
+                        "label": "Statin Intensitas Rendah"
+                    }
+                }
+            ]
+        }
+    ]
+}

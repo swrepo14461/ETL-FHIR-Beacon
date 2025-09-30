@@ -6,7 +6,6 @@ def convertFhirToBeacon(beacon, fhirJson, index, typeFhir, dict = []):
     mapper_path = os.path.join(os.getcwd(), "Mapper.xlsx")
     df = pd.read_excel(mapper_path, sheet_name="Mapper")
     df_filtered = df[df["Where to Find"].str.contains(typeFhir, na=False)]
-    print(f"Processing {typeFhir} at index {index} with {len(df_filtered)} mappings")
 
     groupsMapper = df_filtered.groupby("Where to Use")
 
@@ -68,7 +67,6 @@ def mapFhirToBeacon(row, target, fhirObjDict, df, dict = []):
                                 break
 
                     if not resultValidate:
-                        print("Data Not Valid")
                         isValid = False
                         break
                 elif "COMBINENEXT" in toDo:
@@ -102,14 +100,10 @@ def mapFhirToBeacon(row, target, fhirObjDict, df, dict = []):
                                     arrNextVal = nextValue.split('/')
                                     for dictData in dict:
                                         if dictData['resourceType'] == arrNextVal[0] and dictData['id'] == arrNextVal[1]:
-                                            valFind = [
-                                                coding
-                                                for obj in dictData if arrToFind[1] in obj
-                                                for coding in obj[arrToFind[1]][arrToFind[2]]
-                                            ]
+                                            valToFind = getDynamicData(dictData, arrToFind)                                            
                                             valueToInput.append({
                                                 "row": nextRow,
-                                                "value": valFind
+                                                "value": valToFind
                                             })
                         else:
                             if (nextValue is not None):
@@ -376,3 +370,22 @@ def getIdAndLabel(data: str) -> list:
         return {before if before else "root": arrContent}
     except Exception:
         return {}
+    
+def getDynamicData(data: dict, arrToFind: list):
+    # navigasi sesuai panjang arrToFind
+    val = data
+    for key in arrToFind[1:]:  # skip index 0 (GETREF dsb)
+        if isinstance(val, dict):
+            val = val.get(key, None)
+        else:
+            val = None
+        if val is None:
+            break
+
+    # Normalisasi hasil jadi list
+    if val is None:
+        return []
+    elif isinstance(val, list):
+        return val
+    else:
+        return [val]
