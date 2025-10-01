@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 from urllib.request import pathname2url
 from jsonschema import validate, ValidationError, Draft202012Validator, RefResolver
 
@@ -23,6 +24,7 @@ def doCleanBeaconJson(beacon):
     return cleanedBeacon
 
 def doValidate(beacon):
+    summary = []
     beaconConf = None
     beaconConfSchema = os.path.join(beaconSchemaDir, "beaconConfiguration.json")
     with open(beaconConfSchema) as r:
@@ -61,11 +63,53 @@ def doValidate(beacon):
 
                         dataToValidate = beacon[entryType]
                         if isinstance(dataToValidate, list):
-                            for data in dataToValidate:
-                                pretty_validate(validator, data)
-                        elif isinstance(dataToValidate, dict):
-                            pretty_validate(validator, dataToValidate)
+                            for idx, data in enumerate(dataToValidate):
+                                resultValidate, errMessage = pretty_validate(validator, data)
+                                if resultValidate is True:
+                                    summary.append(f"{entryType} -> Index [{idx}] is Valid")
+                                else:
+                                    summary.append(f"{entryType} -> Index [{idx}] is Not Valid, Reason : ")
+                                    for i, error in enumerate(errMessage, 1):
+                                        location = " -> ".join(map(str, error.path)) or "root"                                        
+                                        if hasattr(error, "validator") and error.validator == "required":
+                                            message = f'In field "{location}" something is missing, reason: {error.message}.'
+                                        elif hasattr(error, "validator") and error.validator == "type":
+                                            message = f'In field "{location}" must be of type {error.validator_value}, but found: {error.instance}.'
+                                        else:
+                                            message = f'Field "{location}": {error.message}'
 
+                                        summary.append(f"{i}. {message}")
+
+                        elif isinstance(dataToValidate, dict):
+                            resultValidate, errMessage = pretty_validate(validator, dataToValidate)
+                            if resultValidate is True:
+                                summary.append(f"{entryType} is Valid")
+                            else:
+                                summary.append(f"{entryType} is Not Valid, Reason : ")
+                                for i, error in enumerate(errMessage, 1):
+                                    location = " -> ".join(map(str, error.path)) or "root"                                        
+                                    if hasattr(error, "validator") and error.validator == "required":
+                                        message = f'In field "{location}" something is missing, reason: {error.message}.'
+                                    elif hasattr(error, "validator") and error.validator == "type":
+                                        message = f'In field "{location}" must be of type {error.validator_value}, but found: {error.instance}.'
+                                    else:
+                                        message = f'Field "{location}": {error.message}'
+
+                                    summary.append(f"{i}. {message}")
+
+            else:
+                summary.append(f"{entryType} Not Found in beacon")
+    
+    if len(summary) > 0:
+        summaryText = "\n".join(summary)
+        print(summaryText)
+        
+        pathResult = os.path.join(os.getcwd(), 'Result')
+        os.makedirs(pathResult, exist_ok=True)
+        filename = f"Beacon_Summary_Validate_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')}.txt"
+        result_file = os.path.join(pathResult, filename)
+        with open(result_file, "a", encoding="utf-8") as f:
+            f.write(summaryText)
                 
 
 # Helper
@@ -113,19 +157,6 @@ def extractId(item):
 def pretty_validate(validator, data):
     errors = sorted(validator.iter_errors(data), key=lambda e: e.path)
     if not errors:
-        print("✅ Beacon valid sesuai schema!")
-        return True
+        return True, []
 
-    print("❌ Beacon tidak valid:")
-    for i, error in enumerate(errors, 1):
-        location = " -> ".join(map(str, error.path)) or "root"
-        # Buat pesan lebih manusiawi
-        if hasattr(error, "validator") and error.validator == "required":
-            missing = ", ".join(error.validator_value)
-            message = f'Field "{location}" hilang, dibutuhkan: {missing}.'
-        elif hasattr(error, "validator") and error.validator == "type":
-            message = f'Field "{location}" harus berupa {error.validator_value}, ditemukan: {error.instance}.'
-        else:
-            message = f'Field "{location}": {error.message}'
-        print(f"{i}. {message}")
-    return False
+    return False, errors
