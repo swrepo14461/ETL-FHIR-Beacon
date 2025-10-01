@@ -85,12 +85,19 @@ def mapFhirToBeacon(row, target, fhirObjDict, df, dict = []):
                             firstCommand = currToDo.split('|')[0]
                             arrToFind = currToDo.split('|')[1].split('-')
                             if arrToFind[0] == "GET":
+                                if arrToFind[1] == "dosageInstruction":
+                                    text = ""
+
                                 if (nextValue is not None):
-                                    valFind = [
-                                        coding
-                                        for obj in nextValue if arrToFind[1] in obj
-                                        for coding in obj[arrToFind[1]][arrToFind[2]]
-                                    ]
+                                    # valFind = [
+                                    #     coding
+                                    #     for obj in nextValue if arrToFind[1] in obj
+                                    #     for coding in obj[arrToFind[1]][arrToFind[2]]
+                                    # ]
+                                    valFind = []
+                                    for obj in nextValue:
+                                        valFind = extractValues(valFind, obj, arrToFind[1:])
+
                                     valueToInput.append({
                                         "row": nextRow,
                                         "value": valFind
@@ -278,7 +285,7 @@ def setBeaconArrayValue(target, arrValue):
                         for val in value:
                             tempDictValueToInput = {}
                             setBeaconValue({
-                                "What to Use Third": None,
+                                "What to Use Third": row["What to Use Third"],
                                 "What to Use Second": "root",
                                 "Type of Use Used": "object",
                                 "What Must Be Done": row["What Must Be Done"],
@@ -286,7 +293,10 @@ def setBeaconArrayValue(target, arrValue):
                             }, tempDictValueToInput, val, True)
                             arrTempVal.append(tempDictValueToInput["root"])
                         
-                        dictValueToInput[row["What to Use Second"]] = arrTempVal
+                        if pd.notna(row["What to Use Third"]):
+                            setNested(dictValueToInput, [row["What to Use Second"]], arrTempVal, as_list=True, doExtend=True)
+                        elif pd.notna(row["What to Use Second"]):
+                            setNested(dictValueToInput, [row["What to Use Second"]], arrTempVal)
                     else:
                         for val in value:
                             tempDictValueToInput = {}
@@ -309,6 +319,30 @@ def setBeaconArrayValue(target, arrValue):
                 setBeaconValue(row, arrValueToInput, value, True)
 
             setNested(target, [firstRow["row"]["What to Use First"]], arrValueToInput, as_list=True, doExtend=False)
+
+def extractValues(valFind, data, keys):
+    if not keys:
+        # level terakhir, pastikan hasilnya array
+        if isinstance(data, list):
+            valFind.extend(data)
+        else:
+            valFind.append(data)
+        return valFind
+
+    key = keys[0]
+
+    # jika key adalah list (multiple possible keys), ambil semua yang match
+    possible_keys = [key] if not isinstance(key, list) else [k for k in key if (isinstance(data, dict) and k in data)]
+
+    for k in possible_keys:
+        if isinstance(data, dict) and k in data:
+            valFind = extractValues(valFind, data[k], keys[1:])
+        elif isinstance(data, list):
+            for item in data:
+                if isinstance(item, dict) and k in item:
+                    valFind = extractValues(valFind, item[k], keys[1:])
+    
+    return valFind
 
 #Helper
 def setNested(target, keys, value, as_list=False, doExtend=False):
