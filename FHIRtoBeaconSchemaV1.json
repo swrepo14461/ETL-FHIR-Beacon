@@ -1,0 +1,618 @@
+{
+    "$comment": "version: bgsi fhir-to-beacon v1",
+    "additionalProperties": true,
+    "description": "Schema for an individual entry based on current FHIR R4 conversion.",
+    "properties": {
+      "diseases": {
+        "description": "List of disease(s) been diagnosed to the individual, defined by disease ontology ID(s), age of onset, stage and the presence of family history.",
+        "items": {
+          "description": "Diseases diagnosed e.g. to an individual, defined by diseaseID, age of onset, stage, level of severity, outcome and the presence of family history. Similarities to GA4GH Phenopackets v2 `Disease`",
+          "properties": {
+            "diseaseCode": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "additionalProperties": true,
+              "description": "Definition of an ontology term.",
+              "properties": {
+                "id": {
+                  "description": "A CURIE identifier, e.g. as `id` for an ontology term.",
+                  "examples": [
+                    "ga4gh:GA.01234abcde",
+                    "DUO:0000004",
+                    "orcid:0000-0003-3463-0775",
+                    "PMID:15254584"
+                  ],
+                  "pattern": "^\\w[^:]+:.+$",
+                  "type": "string"
+                },
+                "label": {
+                  "description": "The text that describes the term. By default it could be the preferred text of the term, but is it acceptable to customize it for a clearer description and understanding of the term in an specific context.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "title": "Ontology Term",
+              "type": "object",
+              "examples": [
+                {
+                  "id": "HP:0004789",
+                  "label": "lactose intolerance"
+                },
+                {
+                  "id": "ICD10CM:E73",
+                  "label": "lactose intolerance"
+                },
+                {
+                  "id": "OMIM:164400",
+                  "label": "Spinocerebellar ataxia 1"
+                }
+              ]
+            },
+            "notes": {
+              "description": "Unstructured text to describe additional properties of this disease instance.",
+              "examples": [
+                "Some free text"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "diseaseCode"
+          ],
+          "title": "Disease",
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "id": {
+        "description": "Individual identifier (internal ID).",
+        "example": "P03647103112",
+        "type": "string"
+      },
+      "interventionsOrProcedures": {
+        "items": {
+          "description": "Class describing a clinical procedure or intervention. Provenance: GA4GH Phenopackets v2 `Procedure`",
+          "properties": {
+            "dateOfProcedure": {
+              "description": "Date of procedure, in ISO8601 format",
+              "example": "2010-07-10",
+              "format": "date",
+              "type": "string"
+            },
+            "procedureCode": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "additionalProperties": true,
+              "description": "Definition of an ontology term.",
+              "properties": {
+                "id": {
+                  "description": "A CURIE identifier, e.g. as `id` for an ontology term.",
+                  "examples": [
+                    "ga4gh:GA.01234abcde",
+                    "DUO:0000004",
+                    "orcid:0000-0003-3463-0775",
+                    "PMID:15254584"
+                  ],
+                  "pattern": "^\\w[^:]+:.+$",
+                  "type": "string"
+                },
+                "label": {
+                  "description": "The text that describes the term. By default it could be the preferred text of the term, but is it acceptable to customize it for a clearer description and understanding of the term in an specific context.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "title": "Ontology Term",
+              "type": "object",
+              "examples": [
+                {
+                  "id": "MAXO:0001175",
+                  "label": "liver transplantation"
+                },
+                {
+                  "id": "MAXO:0000136",
+                  "label": "high-resolution microendoscopy"
+                },
+                {
+                  "id": "OBI:0002654",
+                  "label": "needle biopsy"
+                }
+              ]
+            }
+          },
+          "required": [
+            "procedureCode"
+          ],
+          "title": "Procedure",
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "measurements": {
+        "items": {
+          "additionalProperties": true,
+          "description": "Definition of a measurement class. Provenance: GA4GH Phenopackets v2 `Measurement`",
+          "properties": {
+            "assayCode": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "additionalProperties": true,
+              "description": "Definition of an ontology term.",
+              "properties": {
+                "id": {
+                  "description": "A CURIE identifier, e.g. as `id` for an ontology term.",
+                  "examples": [
+                    "ga4gh:GA.01234abcde",
+                    "DUO:0000004",
+                    "orcid:0000-0003-3463-0775",
+                    "PMID:15254584"
+                  ],
+                  "pattern": "^\\w[^:]+:.+$",
+                  "type": "string"
+                },
+                "label": {
+                  "description": "The text that describes the term. By default it could be the preferred text of the term, but is it acceptable to customize it for a clearer description and understanding of the term in an specific context.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "title": "Ontology Term",
+              "type": "object",
+              "example": {
+                "id": "LOINC:26515-7",
+                "label": "Platelets [#/volume] in Blood"
+              }
+            },
+            "date": {
+              "description": "Date of measurement. Addition compared to Phenopackets model.",
+              "format": "date",
+              "type": "string"
+            },
+            "measurementValue": {
+              "description": "The result of the measurement",
+              "oneOf": [
+                {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "description": "Definition of a value class. Provenance: GA4GH Phenopackets v2 `Value`",
+                  "oneOf": [
+                    {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "additionalProperties": true,
+                      "description": "Definition of a quantity class. Provenance: GA4GH Phenopackets v2 `Quantity`",
+                      "properties": {
+                        "unit": {
+                          "description": "The kind of unit. Recommended from NCIT Unit of Category ontology term (NCIT:C42568) descendants",
+                          "examples": [
+                            {
+                              "id": "NCIT:C70575",
+                              "label": "Roentgen"
+                            },
+                            {
+                              "id": "NCIT:C28252",
+                              "label": "Kilogram"
+                            },
+                            {
+                              "id": "NCIT:C28253",
+                              "label": "Milligram"
+                            }
+                          ],
+                          "$schema": "https://json-schema.org/draft/2020-12/schema",
+                          "additionalProperties": true,
+                          "properties": {
+                            "id": {
+                              "description": "A CURIE identifier, e.g. as `id` for an ontology term.",
+                              "examples": [
+                                "ga4gh:GA.01234abcde",
+                                "DUO:0000004",
+                                "orcid:0000-0003-3463-0775",
+                                "PMID:15254584"
+                              ],
+                              "pattern": "^\\w[^:]+:.+$",
+                              "type": "string"
+                            },
+                            "label": {
+                              "description": "The text that describes the term. By default it could be the preferred text of the term, but is it acceptable to customize it for a clearer description and understanding of the term in an specific context.",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "Ontology Term",
+                          "type": "object"
+                        },
+                        "value": {
+                          "description": "The value of the quantity in the units",
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "unit",
+                        "value"
+                      ],
+                      "title": "Quantity",
+                      "type": "object"
+                    },
+                    {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "additionalProperties": true,
+                      "description": "Definition of an ontology term.",
+                      "properties": {
+                        "id": {
+                          "description": "A CURIE identifier, e.g. as `id` for an ontology term.",
+                          "examples": [
+                            "ga4gh:GA.01234abcde",
+                            "DUO:0000004",
+                            "orcid:0000-0003-3463-0775",
+                            "PMID:15254584"
+                          ],
+                          "pattern": "^\\w[^:]+:.+$",
+                          "type": "string"
+                        },
+                        "label": {
+                          "description": "The text that describes the term. By default it could be the preferred text of the term, but is it acceptable to customize it for a clearer description and understanding of the term in an specific context.",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id"
+                      ],
+                      "title": "Ontology Term",
+                      "type": "object"
+                    }
+                  ],
+                  "title": "Value",
+                  "type": "object"
+                }
+              ]
+            },
+            "notes": {
+              "description": "Unstructured text to describe this measurement. Addition compared to Phenopackets model.",
+              "example": "Some free text",
+              "type": "string"
+            }
+          },
+          "required": [
+            "assayCode",
+            "measurementValue"
+          ],
+          "title": "Measurement",
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "phenotypicFeatures": {
+        "items": {
+          "description": "Used to describe a phenotype that characterizes the subject or biosample.",
+          "properties": {
+            "featureType": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "additionalProperties": true,
+              "description": "Definition of an ontology term.",
+              "properties": {
+                "id": {
+                  "description": "A CURIE identifier, e.g. as `id` for an ontology term.",
+                  "examples": [
+                    "ga4gh:GA.01234abcde",
+                    "DUO:0000004",
+                    "orcid:0000-0003-3463-0775",
+                    "PMID:15254584"
+                  ],
+                  "pattern": "^\\w[^:]+:.+$",
+                  "type": "string"
+                },
+                "label": {
+                  "description": "The text that describes the term. By default it could be the preferred text of the term, but is it acceptable to customize it for a clearer description and understanding of the term in an specific context.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "title": "Ontology Term",
+              "type": "object",
+              "examples": [
+                {
+                  "id": "SNOMED:95566004",
+                  "label": "Urinary stone"
+                }
+              ]
+            },
+            "modifiers": {
+              "description": "This subontology is designed to provide terms to characterize and specify the phenotypic abnormalities defined in the Phenotypic abnormality subontology, with respect to severity, laterality, age of onset, and other aspects. Example use here would be one or more terms from HPO Clinical Modifier (HP:0012823). Source: Phenopackets v2",
+              "examples": [
+                {
+                  "id": "KEMKES:OC000173",
+                  "label": "Derajat hidronefrosi"
+                },
+                {
+                  "id": "KEMKES:OC000175",
+                  "label": "Keparahan batu saluran kemih"
+                }
+              ],
+              "items": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "additionalProperties": true,
+                "description": "Definition of an ontology term.",
+                "properties": {
+                  "id": {
+                    "description": "A CURIE identifier, e.g. as `id` for an ontology term.",
+                    "examples": [
+                      "ga4gh:GA.01234abcde",
+                      "DUO:0000004",
+                      "orcid:0000-0003-3463-0775",
+                      "PMID:15254584"
+                    ],
+                    "pattern": "^\\w[^:]+:.+$",
+                    "type": "string"
+                  },
+                  "label": {
+                    "description": "The text that describes the term. By default it could be the preferred text of the term, but is it acceptable to customize it for a clearer description and understanding of the term in an specific context.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "title": "Ontology Term",
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "notes": {
+              "description": "Unstructured text to describe additional properties of this phenotypic feature.",
+              "example": "Some free text",
+              "type": "string"
+            },
+            "severity": {
+              "examples": [
+                {
+                  "id": "SNOMED:258352004",
+                  "label": "Grade 2"
+                },
+                {
+                  "id": "SNOMED:55189008",
+                  "label": "Non-infected"
+                }
+              ],
+              "description": "Severity as applicable to phenotype or disease observed. Recommended are values from Human Phenotype Ontology (HP:0012824), e.g `mild`. The intensity or degree of a manifestation. Source: Phenopackets v2",
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "additionalProperties": true,
+              "properties": {
+                "id": {
+                  "description": "A CURIE identifier, e.g. as `id` for an ontology term.",
+                  "examples": [
+                    "ga4gh:GA.01234abcde",
+                    "DUO:0000004",
+                    "orcid:0000-0003-3463-0775",
+                    "PMID:15254584"
+                  ],
+                  "pattern": "^\\w[^:]+:.+$",
+                  "type": "string"
+                },
+                "label": {
+                  "description": "The text that describes the term. By default it could be the preferred text of the term, but is it acceptable to customize it for a clearer description and understanding of the term in an specific context.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "title": "Ontology Term",
+              "type": "object"
+            }
+          },
+          "required": [
+            "featureType"
+          ],
+          "title": "PhenotypicFeature",
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "sex": {
+        "description": "Sex of the individual. Value from NCIT General Qualifier (NCIT:C27993): 'unknown' (not assessed or not available) (NCIT:C17998), 'female' (NCIT:C16576), or 'male', (NCIT:C20197).",
+        "examples": [
+          {
+            "id": "NCIT:C16576",
+            "label": "female"
+          },
+          {
+            "id": "NCIT:C20197",
+            "label": "male"
+          },
+          {
+            "id": "NCIT:C1799",
+            "label": "unknown"
+          }
+        ],
+        "properties": {
+          "id": {
+            "description": "A CURIE identifier, e.g. as `id` for an ontology term.",
+            "examples": [
+              "ga4gh:GA.01234abcde",
+              "DUO:0000004",
+              "orcid:0000-0003-3463-0775",
+              "PMID:15254584"
+            ],
+            "pattern": "^\\w[^:]+:.+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "Ontology Term",
+        "type": "object"
+      },
+      "treatments": {
+        "items": {
+          "description": "Treatment(s) prescribed/administered, defined by treatment ID, date and age of onset, dose, schedule and duration.",
+          "properties": {
+            "doseIntervals": {
+              "items": {
+                "description": "This element represents a block of time in which the dosage of a medication was constant. For example, to represent a period of 30 mg twice a day for an interval of 10 days, we would use a Quantity element to represent the individual 30 mg dose, and OntologyClass element to represent twice a day, and an Interval element to represent the 10-day interval. Provenance: Phenopackets v2",
+                "properties": {
+                  "quantity": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "additionalProperties": true,
+                    "description": "Definition of a quantity class. Provenance: GA4GH Phenopackets v2 `Quantity`",
+                    "properties": {
+                      "unit": {
+                        "description": "The kind of unit. Recommended from NCIT Unit of Category ontology term (NCIT:C42568) descendants",
+                        "examples": [
+                          {
+                            "id": "NCIT:C70575",
+                            "label": "Roentgen"
+                          },
+                          {
+                            "id": "NCIT:C28252",
+                            "label": "Kilogram"
+                          },
+                          {
+                            "id": "NCIT:C28253",
+                            "label": "Milligram"
+                          }
+                        ],
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "additionalProperties": true,
+                        "properties": {
+                          "id": {
+                            "description": "A CURIE identifier, e.g. as `id` for an ontology term.",
+                            "examples": [
+                              "ga4gh:GA.01234abcde",
+                              "DUO:0000004",
+                              "orcid:0000-0003-3463-0775",
+                              "PMID:15254584"
+                            ],
+                            "pattern": "^\\w[^:]+:.+$",
+                            "type": "string"
+                          },
+                          "label": {
+                            "description": "The text that describes the term. By default it could be the preferred text of the term, but is it acceptable to customize it for a clearer description and understanding of the term in an specific context.",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id"
+                        ],
+                        "title": "Ontology Term",
+                        "type": "object"
+                      },
+                      "value": {
+                        "description": "The value of the quantity in the units",
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "unit",
+                      "value"
+                    ],
+                    "title": "Quantity",
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "quantity",
+                  "interval",
+                  "scheduleFrequency"
+                ],
+                "title": "DoseInterval",
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "routeOfAdministration": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "additionalProperties": true,
+              "description": "Definition of an ontology term.",
+              "properties": {
+                "id": {
+                  "description": "A CURIE identifier, e.g. as `id` for an ontology term.",
+                  "examples": [
+                    "ga4gh:GA.01234abcde",
+                    "DUO:0000004",
+                    "orcid:0000-0003-3463-0775",
+                    "PMID:15254584"
+                  ],
+                  "pattern": "^\\w[^:]+:.+$",
+                  "type": "string"
+                },
+                "label": {
+                  "description": "The text that describes the term. By default it could be the preferred text of the term, but is it acceptable to customize it for a clearer description and understanding of the term in an specific context.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "title": "Ontology Term",
+              "type": "object",
+              "examples": [
+                {
+                  "id": "NCIT:C38304",
+                  "label": "Topical"
+                },
+                {
+                  "id": "NCIT:C78373",
+                  "label": "Dietary"
+                }
+              ]
+            },
+            "treatmentCode": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "additionalProperties": true,
+              "description": "Definition of an ontology term.",
+              "properties": {
+                "id": {
+                  "description": "A CURIE identifier, e.g. as `id` for an ontology term.",
+                  "examples": [
+                    "ga4gh:GA.01234abcde",
+                    "DUO:0000004",
+                    "orcid:0000-0003-3463-0775",
+                    "PMID:15254584"
+                  ],
+                  "pattern": "^\\w[^:]+:.+$",
+                  "type": "string"
+                },
+                "label": {
+                  "description": "The text that describes the term. By default it could be the preferred text of the term, but is it acceptable to customize it for a clearer description and understanding of the term in an specific context.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "title": "Ontology Term",
+              "type": "object",
+              "examples": [
+                {
+                  "id": "NCIT:C287",
+                  "label": "Aspirin"
+                },
+                {
+                  "id": "NCIT:C62078",
+                  "label": "Tamoxifen"
+                }
+              ]
+            }
+          },
+          "required": [
+            "treatmentCode"
+          ],
+          "title": "Treatment",
+          "type": "object"
+        },
+        "type": "array"
+      }
+    },
+    "required": [
+      "id",
+      "sex"
+    ],
+    "title": "Individual",
+    "type": "object"
+  }
