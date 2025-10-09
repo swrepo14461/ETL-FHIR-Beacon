@@ -64,7 +64,7 @@ Execute the main script to start the extraction, transformation, and validation 
 !python Main.py
 ```
 
-#### 6. Check the Results in the Output Folder
+### 6. Check the Results in the Output Folder
 
 After the script finishes, all results will be saved in the `Result` folder. You will find two files that are automatically generated:
 
