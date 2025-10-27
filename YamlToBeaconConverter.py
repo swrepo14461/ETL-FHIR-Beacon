@@ -43,6 +43,7 @@ def mapFhirToBeacon(row, target, fhirObjDict, df, dict = []):
         for toDo in arrToDo:
             if isValid:
                 if "VALIDATE" in toDo:
+                    validateCond = toDo.split('|')[0].split('-') # VALIDATE-NOT|VALIDATE
                     arrToFind = toDo.split('|')[1].split(',') # category-array, coding-array
                     valToFind = toDo.split('|')[2]
 
@@ -56,15 +57,25 @@ def mapFhirToBeacon(row, target, fhirObjDict, df, dict = []):
                     resultValidate = False
                     for val in arrValToFind:
                         root_val = fhirObjDict.get(arrToFind[0].split('-')[0])
-                        
-                        if root_val is not None and validate_nested(root_val, arrToFind[1:], val):
-                            resultValidate = True
-                            if 'OR' in valToFind:
-                                break
+
+                        if len(validateCond) > 1 and validateCond[1] == "NOT":
+                            if root_val is not None and not validate_nested(root_val, arrToFind[1:], val):
+                                resultValidate = True
+                                if 'OR' in valToFind:
+                                    break
+                            else:
+                                if 'AND' in valToFind:
+                                    resultValidate = False
+                                    break
                         else:
-                            if 'AND' in valToFind:
-                                resultValidate = False
-                                break
+                            if root_val is not None and validate_nested(root_val, arrToFind[1:], val):
+                                resultValidate = True
+                                if 'OR' in valToFind:
+                                    break
+                            else:
+                                if 'AND' in valToFind:
+                                    resultValidate = False
+                                    break
 
                     if not resultValidate:
                         isValid = False
