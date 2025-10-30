@@ -265,6 +265,8 @@ def setBeaconValue(row, target, value, skipFirst: False):
                                     valueToInput[parentKey] = val
                             elif isinstance(item, str):
                                 valueToInput[item] = value[colGet[idx]]
+            elif "TRANSFORMTOBOOLEAN" in arrToDo[0]:
+                valueToInput[item] = (str(value).strip().lower() == str(arrToDo[1]).strip().lower())
     else:
         valueToInput = value
     
