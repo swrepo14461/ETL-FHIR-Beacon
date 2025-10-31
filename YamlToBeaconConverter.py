@@ -43,11 +43,21 @@ def mapFhirToBeacon(row, target, fhirObjDict, df, dict = []):
         arrToDo = whatToDoFind.split('||')
         for toDo in arrToDo:
             if isValid:
-                if "VALIDATE" in toDo or "VALIDATE-NOT" in toDo:
+                if "VALIDATE|" in toDo or "VALIDATE-NOT|" in toDo:
                     valid = validateFhir(toDo, fhirObjDict)
                     if not valid:
                         isValid = False
                         break
+                elif "VALIDATE-HAD|" in toDo:
+                    resultValidate = False
+                    arrToFind = toDo.split('|')[1].split(',') # category-array, coding-array
+
+                    root_val = fhirObjDict.get(arrToFind[0].split('-')[0])
+                    if root_val is not None and validateNestedKey(root_val, arrToFind[1:]):
+                        resultValidate = True
+                    
+                    if not resultValidate:
+                        isValid = False
                 elif "COMBINENEXT" in toDo:
                     firstCommand = toDo
                     arrCommand = firstCommand.split('-')
@@ -232,16 +242,27 @@ def setBeaconValue(row, target, value, skipFirst: False):
                                     valueToInput[parentKey] = val
                             elif isinstance(item, str):
                                 valueToInput[item] = value[colGet[idx]]
-            elif "TRANSFORMTOBOOLEAN" in arrToDo[0]:
-                valueToInput[item] = (str(value).strip().lower() == str(arrToDo[1]).strip().lower())
-            elif "TRANSFORMDATETOAGE" in arrToDo[0]:
+    elif typeUsed == "boolean":
+        toDo = row["What Must Be Done"]
+        if toDo and not pd.isna(toDo):
+            arrToDo = toDo.split('|')
+            if "TRANSFORMTOBOOLEAN" in arrToDo[0]:
+                valueToInput = (str(value).strip().lower() == str(arrToDo[1]).strip().lower())
+            else:
+                valueToInput = value == "1" or value == 1
+    elif typeUsed == "number":
+        toDo = row["What Must Be Done"]
+        if toDo and not pd.isna(toDo):
+            arrToDo = toDo.split('|')
+            if "TRANSFORMDATETOAGE" in arrToDo[0]:
                 today = date.today()
                 birth_date = datetime.strptime(value, "%Y-%m-%d").date()
                 age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
-                valueToInput[item] = age
+                valueToInput = age   
     else:
         valueToInput = value
     
+
     if skipFirst:
         if pd.notna(row["What to Use Third"]):
             setNested(target, [row["What to Use Second"], row["What to Use Third"]], valueToInput)
@@ -348,6 +369,9 @@ def setNested(target, keys, value, as_list=False, doExtend=False):
         d[last_key] = value
 
 def validateFhir(toDo, fhirObjDict):
+    if fhirObjDict["resourceType"] == "Observation":
+        test = "a"
+
     isValid = True
     if "VALIDATE" in toDo:
         arrToFind = toDo.split('|')[1].split(',') # category-array, coding-array
@@ -363,7 +387,7 @@ def validateFhir(toDo, fhirObjDict):
         resultValidate = False
         for val in arrValToFind:
             root_val = fhirObjDict.get(arrToFind[0].split('-')[0])
-            if root_val is not None and validate_nested(root_val, arrToFind[1:], val):
+            if root_val is not None and validateNested(root_val, arrToFind[1:], val):
                 resultValidate = True
                 if 'OR' in valToFind:
                     break
@@ -388,7 +412,7 @@ def validateFhir(toDo, fhirObjDict):
         resultValidate = False
         for val in arrValToFind:
             root_val = fhirObjDict.get(arrToFind[0].split('-')[0])
-            if root_val is not None and not validate_nested(root_val, arrToFind[1:], val):
+            if root_val is not None and not validateNested(root_val, arrToFind[1:], val):
                 resultValidate = True
                 if 'OR' in valToFind:
                     break
@@ -402,7 +426,45 @@ def validateFhir(toDo, fhirObjDict):
     
     return isValid
 
-def validate_nested(val, keyPaths, target):
+def validateNestedKey(val, keyPaths):
+    if not keyPaths:
+        # Sudah sampai key terakhir → key path lengkap ditemukan
+        return True
+
+    keyPath = keyPaths[0].split('-')
+    key = keyPath[0]
+    subtype = keyPath[1] if len(keyPath) > 1 else None
+
+    if isinstance(val, dict):
+        if key not in val:
+            return False
+        next_val = val[key]
+
+        # Jika ini adalah key terakhir
+        if len(keyPaths) == 1:
+            if subtype == "array":
+                return isinstance(next_val, list)
+            else:
+                return True
+
+        # Kalau belum sampai akhir path
+        if subtype == "array" and isinstance(next_val, list):
+            for item in next_val:
+                if validateNestedKey(item, keyPaths[1:]):
+                    return True
+            return False
+        else:
+            return validateNestedKey(next_val, keyPaths[1:])
+
+    elif isinstance(val, list):
+        for item in val:
+            if validateNestedKey(item, keyPaths):
+                return True
+        return False
+
+    return False
+
+def validateNested(val, keyPaths, target):
     if not keyPaths:
         # sudah sampai key terakhir, cek apakah val sama dengan target
         return val == target
@@ -418,13 +480,13 @@ def validate_nested(val, keyPaths, target):
                 return False
             if subtype == "array" and isinstance(next_val, list):
                 for item in next_val:
-                    if validate_nested(item, keyPaths[1:], target):
+                    if validateNested(item, keyPaths[1:], target):
                         return True
             else:
-                return validate_nested(next_val, keyPaths[1:], target)
+                return validateNested(next_val, keyPaths[1:], target)
         elif isinstance(val, list):
             for item in val:
-                if validate_nested(item, keyPaths, target):
+                if validateNested(item, keyPaths, target):
                     return True
 
     return False
