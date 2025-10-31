@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import json
+from datetime import datetime, date
 
 def convertFhirToBeacon(beacon, fhirJson, index, typeFhir, dict = []):
     mapper_path = os.path.join(os.getcwd(), "Mapper.xlsx")
@@ -42,42 +43,9 @@ def mapFhirToBeacon(row, target, fhirObjDict, df, dict = []):
         arrToDo = whatToDoFind.split('||')
         for toDo in arrToDo:
             if isValid:
-                if "VALIDATE" in toDo:
-                    validateCond = toDo.split('|')[0].split('-') # VALIDATE-NOT|VALIDATE
-                    arrToFind = toDo.split('|')[1].split(',') # category-array, coding-array
-                    valToFind = toDo.split('|')[2]
-
-                    if 'OR' in valToFind:
-                        arrValToFind = valToFind.split('OR')
-                    elif 'AND' in valToFind:
-                        arrValToFind = valToFind.split('AND')
-                    else:
-                        arrValToFind = [valToFind]
-
-                    resultValidate = False
-                    for val in arrValToFind:
-                        root_val = fhirObjDict.get(arrToFind[0].split('-')[0])
-
-                        if len(validateCond) > 1 and validateCond[1] == "NOT":
-                            if root_val is not None and not validate_nested(root_val, arrToFind[1:], val):
-                                resultValidate = True
-                                if 'OR' in valToFind:
-                                    break
-                            else:
-                                if 'AND' in valToFind:
-                                    resultValidate = False
-                                    break
-                        else:
-                            if root_val is not None and validate_nested(root_val, arrToFind[1:], val):
-                                resultValidate = True
-                                if 'OR' in valToFind:
-                                    break
-                            else:
-                                if 'AND' in valToFind:
-                                    resultValidate = False
-                                    break
-
-                    if not resultValidate:
+                if "VALIDATE" in toDo or "VALIDATE-NOT" in toDo:
+                    valid = validateFhir(toDo, fhirObjDict)
+                    if not valid:
                         isValid = False
                         break
                 elif "COMBINENEXT" in toDo:
@@ -96,15 +64,7 @@ def mapFhirToBeacon(row, target, fhirObjDict, df, dict = []):
                             firstCommand = currToDo.split('|')[0]
                             arrToFind = currToDo.split('|')[1].split('-')
                             if arrToFind[0] == "GET":
-                                if arrToFind[1] == "dosageInstruction":
-                                    text = ""
-
                                 if (nextValue is not None):
-                                    # valFind = [
-                                    #     coding
-                                    #     for obj in nextValue if arrToFind[1] in obj
-                                    #     for coding in obj[arrToFind[1]][arrToFind[2]]
-                                    # ]
                                     valFind = []
                                     for obj in nextValue:
                                         valFind = extractValues(valFind, obj, arrToFind[1:])
@@ -123,13 +83,20 @@ def mapFhirToBeacon(row, target, fhirObjDict, df, dict = []):
                                                 "row": nextRow,
                                                 "value": valToFind
                                             })
+                        elif '||' in currToDo:
+                            fullCommand = currToDo.split('|')[1]
+                            valid = validateFhir(fullCommand, fhirObjDict)
+                            if valid:
+                                valueToInput.append({
+                                    "row": nextRow,
+                                    "value": nextValue
+                                })
                         else:
                             if (nextValue is not None):
                                 valueToInput.append({
                                     "row": nextRow,
                                     "value": nextValue
                                 })                        
-
                 elif "COMBINED" in toDo:
                     isValid = False
                     break
@@ -267,6 +234,11 @@ def setBeaconValue(row, target, value, skipFirst: False):
                                 valueToInput[item] = value[colGet[idx]]
             elif "TRANSFORMTOBOOLEAN" in arrToDo[0]:
                 valueToInput[item] = (str(value).strip().lower() == str(arrToDo[1]).strip().lower())
+            elif "TRANSFORMDATETOAGE" in arrToDo[0]:
+                today = date.today()
+                birth_date = datetime.strptime(value, "%Y-%m-%d").date()
+                age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+                valueToInput[item] = age
     else:
         valueToInput = value
     
@@ -375,6 +347,61 @@ def setNested(target, keys, value, as_list=False, doExtend=False):
         # level terakhir adalah dict/object atau value biasa
         d[last_key] = value
 
+def validateFhir(toDo, fhirObjDict):
+    isValid = True
+    if "VALIDATE" in toDo:
+        arrToFind = toDo.split('|')[1].split(',') # category-array, coding-array
+        valToFind = toDo.split('|')[2]
+
+        if 'OR' in valToFind:
+            arrValToFind = valToFind.split('OR')
+        elif 'AND' in valToFind:
+            arrValToFind = valToFind.split('AND')
+        else:
+            arrValToFind = [valToFind]
+
+        resultValidate = False
+        for val in arrValToFind:
+            root_val = fhirObjDict.get(arrToFind[0].split('-')[0])
+            if root_val is not None and validate_nested(root_val, arrToFind[1:], val):
+                resultValidate = True
+                if 'OR' in valToFind:
+                    break
+            else:
+                if 'AND' in valToFind:
+                    resultValidate = False
+                    break
+
+        if not resultValidate:
+            isValid = False
+    elif "VALIDATE-NOT" in toDo:
+        arrToFind = toDo.split('|')[1].split(',') # category-array, coding-array
+        valToFind = toDo.split('|')[2]
+
+        if 'OR' in valToFind:
+            arrValToFind = valToFind.split('OR')
+        elif 'AND' in valToFind:
+            arrValToFind = valToFind.split('AND')
+        else:
+            arrValToFind = [valToFind]
+
+        resultValidate = False
+        for val in arrValToFind:
+            root_val = fhirObjDict.get(arrToFind[0].split('-')[0])
+            if root_val is not None and not validate_nested(root_val, arrToFind[1:], val):
+                resultValidate = True
+                if 'OR' in valToFind:
+                    break
+            else:
+                if 'AND' in valToFind:
+                    resultValidate = False
+                    break
+
+        if not resultValidate:
+            isValid = False
+    
+    return isValid
+
 def validate_nested(val, keyPaths, target):
     if not keyPaths:
         # sudah sampai key terakhir, cek apakah val sama dengan target
@@ -436,3 +463,4 @@ def getDynamicData(data: dict, arrToFind: list):
         return val
     else:
         return [val]
+    
