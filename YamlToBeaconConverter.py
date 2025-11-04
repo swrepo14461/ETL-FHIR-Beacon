@@ -23,7 +23,7 @@ def convertFhirToBeacon(beacon, fhirJson, index, typeFhir, dict = []):
             target = mapFhirToBeacon(row, target, fhirJson, df_filtered, dict)
 
         if key in beacon and len(beacon[key]) > index and beacon[key][index] is not None:
-            beacon[key][index] = target
+            beacon[key][index].update(target)
         else:
             beacon[key].append(target)
 
@@ -69,44 +69,49 @@ def mapFhirToBeacon(row, target, fhirObjDict, df, dict = []):
                     for i in range(1, int(totalRowToCombined) + 1):
                         nextRow = df.iloc[df.index.get_loc(row.name) + i]
                         nextValue = getFhirValue(fhirObjDict, nextRow)
-                        currToDo = nextRow["What to Do"]
-                        if '|' in currToDo:
-                            firstCommand = currToDo.split('|')[0]
-                            arrToFind = currToDo.split('|')[1].split('-')
-                            if arrToFind[0] == "GET":
-                                if (nextValue is not None):
-                                    valFind = []
-                                    for obj in nextValue:
-                                        valFind = extractValues(valFind, obj, arrToFind[1:])
+                        rowCurrToDo = nextRow["What to Do"]
+                        arrCurrToDo = rowCurrToDo.split('||')
+                        isCurrToDoValid = True
+                        for currToDo in arrCurrToDo:
+                            if isCurrToDoValid:
+                                if "VALIDATE|" in currToDo or "VALIDATE-NOT|" in currToDo:
+                                    if "VALIDATE-NOT|" in currToDo:
+                                        b = ""
 
-                                    valueToInput.append({
-                                        "row": nextRow,
-                                        "value": valFind
-                                    })
-                            elif arrToFind[0] == "GETREF":
-                                if nextValue is not None:
-                                    arrNextVal = nextValue.split('/')
-                                    for dictData in dict:
-                                        if dictData['resourceType'] == arrNextVal[0] and dictData['id'] == arrNextVal[1]:
-                                            valToFind = getDynamicData(dictData, arrToFind)                                            
-                                            valueToInput.append({
-                                                "row": nextRow,
-                                                "value": valToFind
-                                            })
-                        elif '||' in currToDo:
-                            fullCommand = currToDo.split('|')[1]
-                            valid = validateFhir(fullCommand, fhirObjDict)
-                            if valid:
-                                valueToInput.append({
-                                    "row": nextRow,
-                                    "value": nextValue
-                                })
-                        else:
-                            if (nextValue is not None):
-                                valueToInput.append({
-                                    "row": nextRow,
-                                    "value": nextValue
-                                })                        
+                                    currValid = validateFhir(currToDo, fhirObjDict)
+                                    if not currValid:
+                                        isCurrToDoValid = False
+                                        break
+                                elif '|' in currToDo:
+                                    firstCommand = currToDo.split('|')[0]
+                                    arrToFind = currToDo.split('|')[1].split('-')
+                                    if arrToFind[0] == "GET":
+                                        if (nextValue is not None):
+                                            valFind = []
+                                            for obj in nextValue:
+                                                valFind = extractValues(valFind, obj, arrToFind[1:])
+
+                                            if len(valFind) > 0:
+                                                valueToInput.append({
+                                                    "row": nextRow,
+                                                    "value": valFind
+                                                })
+                                    elif arrToFind[0] == "GETREF":
+                                        if nextValue is not None:
+                                            arrNextVal = nextValue.split('/')
+                                            for dictData in dict:
+                                                if dictData['resourceType'] == arrNextVal[0] and dictData['id'] == arrNextVal[1]:
+                                                    valToFind = getDynamicData(dictData, arrToFind)                                            
+                                                    valueToInput.append({
+                                                        "row": nextRow,
+                                                        "value": valToFind
+                                                    })
+                                else:
+                                    if (nextValue is not None):
+                                        valueToInput.append({
+                                            "row": nextRow,
+                                            "value": nextValue
+                                        })                                                
                 elif "COMBINED" in toDo:
                     isValid = False
                     break
@@ -234,11 +239,26 @@ def setBeaconValue(row, target, value, skipFirst: False):
                                     else:
                                         colGet2 = None
 
-                                    for idx2, item2 in enumerate(subKeys):
-                                        if colGet2[idx2] == "unitcode":
-                                            val[item2] = f"{codeUnit}:{value["code"]}"
+                                    def process_subkeys(sub_keys, col_values, base_value):
+                                        result = {}
+                                        if isinstance(sub_keys, dict):
+                                            # nested dict → panggil lagi secara rekursif
+                                            for sub_parent, sub_items in sub_keys.items():
+                                                result[sub_parent] = process_subkeys(sub_items, col_values, base_value)
+                                        elif isinstance(sub_keys, list):
+                                            for i, key_name in enumerate(sub_keys):
+                                                if col_values is None or i >= len(col_values):
+                                                    continue
+                                                if col_values[i] == "unitcode":
+                                                    result[key_name] = f"{codeUnit}:{base_value['code']}"
+                                                else:
+                                                    result[key_name] = base_value[col_values[i]]
                                         else:
-                                            val[item2] = value[colGet2[idx2]]
+                                            # fallback, kalau sub_keys bukan list/dict
+                                            result[sub_keys] = None
+                                        return result
+
+                                    val = process_subkeys(subKeys, colGet2, value)
                                     valueToInput[parentKey] = val
                             elif isinstance(item, str):
                                 valueToInput[item] = value[colGet[idx]]
@@ -248,8 +268,8 @@ def setBeaconValue(row, target, value, skipFirst: False):
             arrToDo = toDo.split('|')
             if "TRANSFORMTOBOOLEAN" in arrToDo[0]:
                 valueToInput = (str(value).strip().lower() == str(arrToDo[1]).strip().lower())
-            else:
-                valueToInput = value == "1" or value == 1
+        else:
+            valueToInput = value == "1" or value == 1 or value == True
     elif typeUsed == "number":
         toDo = row["What Must Be Done"]
         if toDo and not pd.isna(toDo):
@@ -259,10 +279,17 @@ def setBeaconValue(row, target, value, skipFirst: False):
                 birth_date = datetime.strptime(value, "%Y-%m-%d").date()
                 age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
                 valueToInput = age   
+    elif typeUsed == "identifier":
+        toDo = row["What Must Be Done"]
+        if toDo and not pd.isna(toDo):
+            arrToDo = toDo.split('|')
+            if "SPLIT" in arrToDo[0]:
+                command = arrToDo[0].split('-')
+                command_index = int(command[2]) 
+                valueToInput = value.split(command[1])[command_index]
     else:
         valueToInput = value
     
-
     if skipFirst:
         if pd.notna(row["What to Use Third"]):
             setNested(target, [row["What to Use Second"], row["What to Use Third"]], valueToInput)
@@ -270,9 +297,9 @@ def setBeaconValue(row, target, value, skipFirst: False):
             setNested(target, [row["What to Use Second"]], valueToInput)
     else:
         if pd.notna(row["What to Use Third"]):
-            setNested(target, [row["What to Use First"], [row["What to Use Second"]], [row["What to Use Third"]]], valueToInput)
+            setNested(target, [row["What to Use First"], row["What to Use Second"], row["What to Use Third"]], valueToInput)
         elif pd.notna(row["What to Use Second"]):
-            setNested(target, [row["What to Use First"], [row["What to Use Second"]]], valueToInput)
+            setNested(target, [row["What to Use First"], row["What to Use Second"]], valueToInput)
         elif pd.notna(row["What to Use First"]):
             setNested(target, [row["What to Use First"]], valueToInput)
     
@@ -314,7 +341,11 @@ def setBeaconArrayValue(target, arrValue):
             if len(arrValueToInput) > 0:
                 for dictItem in arrValueToInput:
                     dictItem.update(dictValueToInput)
-                setNested(target, [firstRow["row"]["What to Use First"]], arrValueToInput, as_list=True, doExtend=True)
+                
+                if pd.notna(firstRow["row"]["What to Use First"]):
+                    setNested(target, [firstRow["row"]["What to Use First"]], arrValueToInput, as_list=True, doExtend=True)
+                else:
+                    target.update(dictItem)
             else:
                 setNested(target, [firstRow["row"]["What to Use First"]], dictValueToInput, as_list=True, doExtend=False)
         else:
@@ -354,7 +385,7 @@ def extractValues(valFind, data, keys):
 def setNested(target, keys, value, as_list=False, doExtend=False):
     d = target
     for key in keys[:-1]:
-        # pastikan level dict ada
+        # pastikan level dict ada   
         d = d.setdefault(key, {})
     
     last_key = keys[-1]
@@ -373,7 +404,7 @@ def validateFhir(toDo, fhirObjDict):
         test = "a"
 
     isValid = True
-    if "VALIDATE" in toDo:
+    if "VALIDATE|" in toDo:
         arrToFind = toDo.split('|')[1].split(',') # category-array, coding-array
         valToFind = toDo.split('|')[2]
 
@@ -398,7 +429,7 @@ def validateFhir(toDo, fhirObjDict):
 
         if not resultValidate:
             isValid = False
-    elif "VALIDATE-NOT" in toDo:
+    elif "VALIDATE-NOT|" in toDo:
         arrToFind = toDo.split('|')[1].split(',') # category-array, coding-array
         valToFind = toDo.split('|')[2]
 
@@ -493,17 +524,46 @@ def validateNested(val, keyPaths, target):
 
 def getIdAndLabel(data: str) -> list:
     try:
-        start = data.find('[') + 1
-        end = data.find(']')
+        data = data.strip()
+
+        # Jika tidak ada kurung sama sekali
+        if '[' not in data or ']' not in data:
+            return data
+
+        start = data.find('[')
+        end = data.rfind(']')
         
-        # Pastikan formatnya valid
-        if start == 0 or end == -1:
-            return {}
+        # Validasi dasar
+        if start == -1 or end == -1 or end <= start:
+            return data
+
+        # Bagian sebelum '['
+        before = data[:start].rstrip('[:')
+
+        # Isi di dalam tanda kurung
+        inner = data[start + 1:end]
+
+        # Jika isi di dalamnya masih ada kurung, parse lagi (rekursif)
+        if '[' in inner and ']' in inner:
+            value = getIdAndLabel(inner)
+        else:
+            # Kalau tidak bersarang, pisahkan dengan ':'
+            value = inner.split(':')
+
+            # Bungkus ke dict
+        return {before if before else "root": value}
+
+        # start = data.find('[') + 1
+        # end = data.rfind(']')
         
-        before = data[:start].rstrip('[:')   
-        arrContent = data[start:end].split(':')
+        # # Pastikan formatnya valid
+        # if start == 0 or end == -1:
+        #     return {}
+
+        # before = data[:start].rstrip('[:')   
+        # arrContent = data[start:end].split(':')
         
-        return {before if before else "root": arrContent}
+        # return {before if before else "root": arrContent}
     except Exception:
         return {}
     

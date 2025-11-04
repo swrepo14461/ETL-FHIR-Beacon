@@ -121,19 +121,27 @@ def cleanBeacon(beaconJson):
         return cleaned
 
     elif isinstance(beaconJson, list):
-        seen = set()
         cleaned = []
         for item in beaconJson:
-            if isinstance(item, dict):
-                code_id = extractId(item)
-                if code_id:
-                    if code_id not in seen:
-                        seen.add(code_id)
-                        cleaned.append(cleanBeacon(item))
-                else:
-                    cleaned.append(cleanBeacon(item))
+            if isinstance(item, (dict, list)):
+                cleaned.append(cleanBeacon(item))
             else:
                 cleaned.append(item)
+                
+        # Hapus Duplikat dihilangkan karena semua id nya sama
+        # seen = set()
+        # cleaned = []
+        # for item in beaconJson:
+        #     if isinstance(item, dict):
+        #         code_id = extractId(item)
+        #         if code_id:
+        #             if code_id not in seen:
+        #                 seen.add(code_id)
+        #                 cleaned.append(cleanBeacon(item))
+        #         else:
+        #             cleaned.append(cleanBeacon(item))
+        #     else:
+        #         cleaned.append(item)
         return cleaned
 
     else:

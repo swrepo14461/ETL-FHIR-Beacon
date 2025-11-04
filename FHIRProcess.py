@@ -75,8 +75,8 @@ def process_fhir_resource(beacon, file_path, index):
 
         resource_type = resource_json.get("resourceType")
         allowed_types = [
-            "Patient", "Procedure", "Condition", "Observation",
-            "AllergyIntolerance", "MedicationRequest", "MedicationDispense", "FamilyMemberHistory"
+            "Patient", "Procedure", "Condition", "Observation", "Medication", "Immunization", "ServiceRequest",
+            "AllergyIntolerance", "NutritionOrder", "MedicationDispense", "FamilyMemberHistory", "Specimen"
         ]
 
         if resource_type in allowed_types:
@@ -89,25 +89,43 @@ def process_fhir_resource(beacon, file_path, index):
 def getIndex(beacon, file_path, index):
     with open(file_path, 'r', encoding='utf-8') as f:
         json_data = json.load(f)
-    
     entries = json_data.get("entry", [])
-    for i, entry in enumerate(entries):
-        
-        resource_json = entry.get("resource")
-        if not resource_json:
-            continue
+    
+    lsIndividuals = []
+    if "individual" in beacon:
+        lsIndividuals = beacon["individual"]
 
-        resource_type = resource_json.get("resourceType")
-        if resource_type == "Patient":
-            if "individuals" in beacon:
-                lsIndividuals = beacon["individuals"]
+    if len(lsIndividuals) == 0:
+        return 0
+
+    founded = False
+    for i, entry in enumerate(entries):
+        if not founded:
+            resource_json = entry.get("resource")
+            if not resource_json:
+                continue
+
+            resource_type = resource_json.get("resourceType")
+            if resource_type == "Patient":
                 for idx, indv in enumerate(lsIndividuals):
                     indv_id = indv.get("id")
                     if indv_id is not None and indv_id == resource_json["id"]:
                         index = idx
+                        founded = True
                         break
-    
-    return index
+            elif resource_type == "Observation":
+                for idx, indv in enumerate(lsIndividuals):
+                    indv_id = indv.get("id")
+                    id_resource = resource_json["subject"]["reference"].split('/')[1]
+                    if indv_id is not None and indv_id == id_resource:
+                        index = idx
+                        founded = True
+                        break
+
+    if founded:
+        return index
+    else:
+        return len(lsIndividuals)
 
 def getDictionary(file_path):
     with open(file_path, 'r', encoding='utf-8') as f:
