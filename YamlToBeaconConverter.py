@@ -339,13 +339,20 @@ def setBeaconArrayValue(target, arrValue):
                     setBeaconValue(row, dictValueToInput, value, True)
 
             if len(arrValueToInput) > 0:
+                tempDictItem = {}
+                if dictValueToInput is not None:
+                    tempDictItem.update(dictValueToInput)
+
                 for dictItem in arrValueToInput:
-                    dictItem.update(dictValueToInput)
+                    tempDictItem.update(dictItem)
+
+                # for dictItem in arrValueToInput:
+                #     dictItem.update(dictValueToInput)
                 
                 if pd.notna(firstRow["row"]["What to Use First"]):
-                    setNested(target, [firstRow["row"]["What to Use First"]], arrValueToInput, as_list=True, doExtend=True)
+                    setNested(target, [firstRow["row"]["What to Use First"]], tempDictItem, as_list=True, doExtend=True)
                 else:
-                    target.update(dictItem)
+                    target.update(tempDictItem)
             else:
                 setNested(target, [firstRow["row"]["What to Use First"]], dictValueToInput, as_list=True, doExtend=False)
         else:
