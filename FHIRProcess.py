@@ -70,16 +70,20 @@ def process_fhir_resource(beacon, file_path, index):
     entries = json_data.get("entry", [])
     for i, entry in enumerate(entries):
         resource_json = entry.get("resource")
-        if not resource_json:
-            continue
-
-        resource_type = resource_json.get("resourceType")
+        if resource_json:
+            resource_type = resource_json.get("resourceType")
+        else:
+            resource_json = entry
+            resource_type = entry.get("resourceType")
+        
         allowed_types = [
             "Patient", "Procedure", "Condition", "Observation", "Medication", "Immunization", "ServiceRequest",
             "AllergyIntolerance", "NutritionOrder", "MedicationDispense", "FamilyMemberHistory", "Specimen"
         ]
 
         if resource_type in allowed_types:
+            if resource_type == "Procedure":
+                aa = ""
             beacon = YamlToBeaconConverter.convertFhirToBeacon(beacon, resource_json, index, resource_type, dict)
         else:
             invalid_count += 1
