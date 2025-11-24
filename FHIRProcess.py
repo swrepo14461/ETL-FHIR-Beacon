@@ -106,10 +106,12 @@ def getIndex(beacon, file_path, index):
     for i, entry in enumerate(entries):
         if not founded:
             resource_json = entry.get("resource")
-            if not resource_json:
-                continue
+            if resource_json:
+                resource_type = resource_json.get("resourceType")
+            else:
+                resource_json = entry
+                resource_type = entry.get("resourceType")
 
-            resource_type = resource_json.get("resourceType")
             if resource_type == "Patient":
                 for idx, indv in enumerate(lsIndividuals):
                     indv_id = indv.get("id")
@@ -139,10 +141,12 @@ def getDictionary(file_path):
     entries = json_data.get("entry", [])
     for i, entry in enumerate(entries):
         resource_json = entry.get("resource")
-        if not resource_json:
-            continue
-        
-        resource_type = resource_json.get("resourceType")
+        if resource_json:
+            resource_type = resource_json.get("resourceType")
+        else:
+            resource_json = entry
+            resource_type = entry.get("resourceType")
+            
         if resource_type == "Medication":
             dictResource.append(resource_json)
 
