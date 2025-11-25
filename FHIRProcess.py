@@ -82,8 +82,6 @@ def process_fhir_resource(beacon, file_path, index):
         ]
 
         if resource_type in allowed_types:
-            if resource_type == "Procedure":
-                aa = ""
             beacon = YamlToBeaconConverter.convertFhirToBeacon(beacon, resource_json, index, resource_type, dict)
         else:
             invalid_count += 1
