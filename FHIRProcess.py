@@ -20,10 +20,10 @@ pathFhirJsonDir = os.path.join(os.getcwd(), 'FHIR Json')
 def validate_fhir_resource(json_file):
     file_path = os.path.join(pathFhirJsonDir, json_file)
     with open(file_path, 'r', encoding='utf-8') as f:
-        json_data = f.read()
+        json_data = json.load(f)
 
     try:
-        resource_type = json_data.split('"resourceType": "')[1].split('"')[0]
+        resource_type = json_data.get("resourceType", "")
     except Exception as e:
         return False, file_path
 
