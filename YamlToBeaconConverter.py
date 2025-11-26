@@ -106,8 +106,23 @@ def mapFhirToBeacon(row, target, fhirObjDict, df, dict = []):
                                                         "row": nextRow,
                                                         "value": valToFind
                                                     })
+                                    elif arrToFind[0] == "GETVALID":
+                                        newNextValue = []
+                                        if nextValue is not None:
+                                            key, vals = arrToFind[1].split(',')
+                                            validate_set = {v.replace('%2D', '-') for v in vals.split(';')}
+
+                                            for nVal in nextValue:
+                                                if nVal.get(key) in validate_set:
+                                                    newNextValue.append(nVal)
+                                        
+                                        if len(newNextValue) > 0:
+                                            valueToInput.append({
+                                                "row": nextRow,
+                                                "value": newNextValue
+                                            })
                                 else:
-                                    if (nextValue is not None):
+                                    if nextValue is not None:
                                         valueToInput.append({
                                             "row": nextRow,
                                             "value": nextValue
@@ -337,22 +352,22 @@ def setBeaconArrayValue(target, arrValue):
                             arrValueToInput.append(tempDictValueToInput)
                 else:
                     setBeaconValue(row, dictValueToInput, value, True)
-
-            if len(arrValueToInput) > 0:
+            
+            if dictValueToInput and len(arrValueToInput) > 0:
                 tempDictItem = {}
-                if dictValueToInput is not None:
+                if dictValueToInput:
                     tempDictItem.update(dictValueToInput)
 
                 for dictItem in arrValueToInput:
                     tempDictItem.update(dictItem)
-
-                # for dictItem in arrValueToInput:
-                #     dictItem.update(dictValueToInput)
                 
                 if pd.notna(firstRow["row"]["What to Use First"]):
                     setNested(target, [firstRow["row"]["What to Use First"]], tempDictItem, as_list=True, doExtend=True)
                 else:
                     target.update(tempDictItem)
+            elif len(arrValueToInput) > 0:
+                if pd.notna(firstRow["row"]["What to Use First"]):
+                    setNested(target, [firstRow["row"]["What to Use First"]], arrValueToInput, as_list=True, doExtend=True)
             else:
                 setNested(target, [firstRow["row"]["What to Use First"]], dictValueToInput, as_list=True, doExtend=False)
         else:
