@@ -38,8 +38,9 @@ for idx, filesTobeacon in enumerate(valid_files):
     print(f"Processing {filesTobeacon}...")
     newIdx = FHIRProcess.getIndex(beacon, filesTobeacon, idx)
     beacon = FHIRProcess.process_fhir_resource(beacon, filesTobeacon, newIdx)
-    pathResult = os.path.join(os.getcwd(), 'Result')
-    os.makedirs(pathResult, exist_ok=True)
+    
+pathResult = os.path.join(os.getcwd(), 'Result')
+os.makedirs(pathResult, exist_ok=True)
 
 print(f"Start Cleaning Beacon...")
 cleanedBeacon = CleanAndValidateBeacon.doCleanBeaconJson(beacon)
