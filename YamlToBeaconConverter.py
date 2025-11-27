@@ -422,9 +422,6 @@ def setNested(target, keys, value, as_list=False, doExtend=False):
         d[last_key] = value
 
 def validateFhir(toDo, fhirObjDict):
-    if fhirObjDict["resourceType"] == "Observation":
-        test = "a"
-
     isValid = True
     if "VALIDATE|" in toDo:
         arrToFind = toDo.split('|')[1].split(',') # category-array, coding-array

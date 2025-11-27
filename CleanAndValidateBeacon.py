@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 from urllib.request import pathname2url
 from jsonschema import validate, ValidationError, Draft202012Validator, RefResolver
+from decimal import Decimal
 
 beaconSchemaDir = os.path.join(os.getcwd(), "BeaconSchema")
 def doCleanBeaconJson(beacon):
@@ -110,7 +111,17 @@ def doValidate(beacon):
         result_file = os.path.join(pathResult, filename)
         with open(result_file, "a", encoding="utf-8") as f:
             f.write(summaryText)
-                
+
+def doConvertToString(beacon):
+    if isinstance(beacon, list):
+        return [doConvertToString(i) for i in beacon]
+    elif isinstance(beacon, dict):
+        return {k: doConvertToString(v) for k, v in beacon.items()}
+    elif isinstance(beacon, (Decimal, float, int)):
+        return str(beacon)
+    
+    return beacon
+
 
 # Helper
 def cleanBeacon(beaconJson):

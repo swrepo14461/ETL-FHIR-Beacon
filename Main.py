@@ -48,10 +48,13 @@ cleanedBeacon = CleanAndValidateBeacon.doCleanBeaconJson(beacon)
 print(f"Start Validate Beacon...")
 CleanAndValidateBeacon.doValidate(cleanedBeacon)
 
+print(f"Start Convert To String...")
+convertedBeacon = CleanAndValidateBeacon.doConvertToString(cleanedBeacon)
+
 print(f"Generate Beacon File...")
 filename = f"Beacon_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')}.json"
 result_file = os.path.join(pathResult, filename)
 with open(result_file, 'w') as out_f:
-    out_f.write(json.dumps(OrderedDict(cleanedBeacon), indent=4, sort_keys=True, default=str))
+    out_f.write(json.dumps(OrderedDict(convertedBeacon), indent=4, sort_keys=True, default=str))
 
 print(f"Generated to {result_file}...")
